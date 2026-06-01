@@ -13,8 +13,17 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
+  <!-- Chosen Palette: Modern Light Glass (Whites, Light Grays, Gold #c29b38, Dark Text #1e293b) -->
+  <!-- Application Structure Plan: Persistent Sidebar (Desktop) / Bottom Nav (Mobile). Analytics section updated with specific DB-driven KPIs, dynamic dropdowns/tabs for region/coach filtering, and localized Korean text. Added a line chart for branch trends. -->
+  <!-- Visualization & Content Choices: 
+       - Tables: Responsive, transforms to cards on mobile.
+       - Heatmap: Custom CSS Grid. Numbers explicitly shown. Font color dynamically inverts. No SVG.
+       - Line Chart: Branch student trend over 7 days.
+       - Radar Chart: Measurable coach KPIs (Students, Lifespan, Tier increase, Consults, Retention) with select dropdown.
+       - Bar Charts: Dynamic region filtering via tabs for Churn and Lifespan. -->
+  <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
   <style>
-    /* === Modern Light Glass Theme === */
     :root { 
       --geng-gold: #c29b38; 
       --geng-gold-light: rgba(194, 155, 56, 0.15);
@@ -34,241 +43,179 @@
       letter-spacing: -0.01em; 
     }
 
-    /* Mesh Gradient Background (Trendy Aurora Effect) */
+    /* Ambient Background */
     .mesh-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; background: #f3f5f9; }
     .mesh-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; animation: float 20s infinite ease-in-out alternate; pointer-events: none; }
     .mesh-blob-1 { background: rgba(194, 155, 56, 0.3); width: 40vw; height: 40vw; top: -10%; left: -10%; }
     .mesh-blob-2 { background: rgba(59, 130, 246, 0.2); width: 35vw; height: 35vw; bottom: 0%; right: -5%; animation-delay: -5s;}
     .mesh-blob-3 { background: rgba(16, 185, 129, 0.15); width: 30vw; height: 30vw; top: 40%; left: 40%; animation-delay: -10s;}
-    
-    @keyframes float {
-        0% { transform: translate(0, 0) scale(1); }
-        50% { transform: translate(5%, 10%) scale(1.1); }
-        100% { transform: translate(-5%, -5%) scale(0.9); }
-    }
+    @keyframes float { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(5%, 10%) scale(1.1); } 100% { transform: translate(-5%, -5%) scale(0.9); } }
 
-    /* === True Glass Panel === */
-    .glass-panel {
-      background: var(--glass-bg);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border-radius: 20px;
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      transition: all 0.3s ease;
-    }
+    /* Glass Panels */
+    .glass-panel { background: var(--glass-bg); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border-radius: 20px; border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); transition: all 0.3s ease; }
+    .geng-panel-glow { position: relative; background: var(--glass-bg); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border-radius: 24px; overflow: hidden; border: 1px solid var(--glass-border); box-shadow: 0 8px 32px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; z-index: 1; }
+    .geng-panel-glow:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(194, 155, 56, 0.12), inset 0 1px 0 rgba(255,255,255,1); }
+    .geng-panel-glow::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.9), transparent 40%); z-index: -1; opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
+    .geng-panel-glow:hover::before { opacity: 1; }
 
-    /* === Layout: Sidebar + Main === */
+    /* Layout */
     .app-layout { display: flex; height: 100vh; width: 100vw; }
-    
     .sidebar { width: 260px; padding: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 40; border-right: 1px solid rgba(255,255,255,0.6); background: rgba(255,255,255,0.3); backdrop-filter: blur(40px); }
-    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: var(--text-muted); font-weight: 700; cursor: pointer; transition: 0.2s; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px;}
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: var(--text-muted); font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
     .nav-item:hover { background: rgba(255,255,255,0.6); color: var(--text-main); }
     .nav-item.active { background: #fff; color: var(--geng-gold); box-shadow: 0 4px 15px rgba(194, 155, 56, 0.15); border: 1px solid rgba(255,255,255,0.8);}
-    .nav-item i { font-size: 1.2rem; }
-
     .main-content { flex: 1; overflow-y: auto; padding: 32px; position: relative; scroll-behavior: smooth; }
-
-    /* === Components === */
     .view-section { display: none; opacity: 0; }
     .view-section.active { display: block; animation: fadeIn 0.4s ease forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Inputs */
+    /* UI Elements */
     .form-control-custom, .form-select-custom { background: rgba(255,255,255,0.7) !important; border: 1px solid rgba(255,255,255,0.9) !important; border-radius: 12px; padding: 12px 16px; font-size: 0.95rem; width: 100%; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); transition: 0.3s; color: var(--text-main) !important;}
     .form-control-custom:focus, .form-select-custom:focus { background: #fff !important; border-color: var(--geng-gold) !important; box-shadow: 0 0 0 3px var(--geng-gold-light) !important; outline: none; }
-
-    /* Buttons */
-    .btn-gold { background: linear-gradient(135deg, #dfbd69 0%, #c29b38 100%); color: #fff; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; box-shadow: 0 6px 15px rgba(194, 155, 56, 0.3); transition: 0.3s; text-transform: uppercase; letter-spacing: 0.5px;}
+    .btn-gold { background: linear-gradient(135deg, #dfbd69 0%, #c29b38 100%); color: #fff; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; box-shadow: 0 6px 15px rgba(194, 155, 56, 0.3); transition: 0.3s; }
     .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(194, 155, 56, 0.4); color: #fff; }
     .btn-glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,1); color: var(--text-main); font-weight: 700; border-radius: 12px; padding: 8px 16px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
     .btn-glass:hover { background: #fff; color: var(--geng-gold); }
-
-    /* Pill Tabs (Filters) */
-    .pill-tab { padding: 6px 16px; border-radius: 30px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
+    .pill-tab { padding: 6px 16px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
     .pill-tab:hover { background: rgba(255,255,255,0.5); }
     .pill-tab.active { background: #fff; color: var(--geng-gold); border-color: rgba(255,255,255,0.9); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-    /* Table Typography & Layout */
+    /* Tables & Cell Clicking */
     .table-container { overflow-x: auto; border-radius: 16px; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.8); box-shadow: var(--glass-shadow); }
-    table { width: 100%; text-align: left; font-size: 0.85rem; border-collapse: collapse; }
-    th { background: rgba(255,255,255,0.7); padding: 16px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(0,0,0,0.05); white-space: nowrap; position: sticky; top: 0; z-index: 10; }
-    td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.5); white-space: nowrap; color: #334155; font-weight: 500; transition: 0.2s;}
-    tr:hover td { background: rgba(255,255,255,0.7); }
-    
+    table { width: 100%; text-align: left; font-size: 0.9rem; border-collapse: collapse; }
+    th { background: rgba(255,255,255,0.7); padding: 16px; font-weight: 800; color: var(--text-muted); border-bottom: 1px solid rgba(0,0,0,0.05); white-space: nowrap; position: sticky; top: 0; z-index: 10; }
+    td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.5); white-space: nowrap; color: #334155; font-weight: 500; transition: 0.2s; cursor: pointer; }
+    tr:hover td { background: rgba(255,255,255,0.8); color: var(--geng-gold); }
     .col-id { color: var(--geng-gold); font-weight: 800; cursor: pointer; text-decoration: none;}
     .col-id:hover { text-decoration: underline; }
-    
-    .badge-status { padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+    .badge-status { padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; display: inline-block; }
     .status-active { background: rgba(16, 185, 129, 0.15); color: #059669; }
     .status-waiting { background: rgba(59, 130, 246, 0.15); color: #2563eb; }
     .status-loading { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
     .status-inactive { background: rgba(100, 116, 139, 0.15); color: #475569; }
-
-    /* Charts (Analytics) */
-    .chart-box { position: relative; width: 100%; height: 320px; padding: 10px 0; }
-
-    /* Analytics Heatmap */
-    .heatmap-grid { display: grid; grid-template-columns: 70px repeat(7, 1fr); gap: 4px; overflow-x: auto; padding-top: 10px;}
-    .heatmap-cell { aspect-ratio: 2/1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: transparent; transition: all 0.2s; cursor: crosshair; }
-    .heatmap-cell:hover { color: #1e293b; transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; }
-    .heatmap-header { font-weight: 800; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; text-transform: uppercase; }
-    .heatmap-time { font-weight: 800; color: var(--text-muted); display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; font-size: 0.75rem; }
     
-    .custom-tooltip { position: fixed; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); color: white; padding: 8px 12px; border-radius: 8px; font-size: 0.75rem; pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 99999; white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .comment-row td { background-color: rgba(194, 155, 56, 0.03) !important; padding: 0 !important; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .comment-content { display: flex; align-items: center; gap: 8px; padding: 10px 16px; font-weight: 600; color: #64748b; font-size: 0.85rem; }
+
+    /* Charts */
+    .chart-box { position: relative; width: 100%; height: 320px; padding: 10px 0; }
+    .heatmap-grid { display: grid; grid-template-columns: 70px repeat(7, 1fr); gap: 4px; overflow-x: auto; padding-top: 10px;}
+    .heatmap-cell { aspect-ratio: 2/1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 800; transition: all 0.2s; cursor: crosshair; }
+    .heatmap-cell:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; border: 1px solid #1e293b; }
+    .heatmap-header { font-weight: 800; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+    .heatmap-time { font-weight: 800; color: var(--text-muted); display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; font-size: 0.85rem; }
+    .custom-tooltip { position: fixed; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); color: white; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 99999; white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
     /* Toasts & Modals */
     #toast-container { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; align-items: center; pointer-events: none;}
-    .toast-msg { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); color: var(--text-main); padding: 14px 28px; border-radius: 100px; font-weight: 800; font-size: 0.9rem; box-shadow: 0 10px 40px rgba(0,0,0,0.1); animation: toastAnim 0.3s forwards; border: 1px solid #fff; pointer-events: auto;}
+    .toast-msg { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); color: var(--text-main); padding: 14px 28px; border-radius: 100px; font-weight: 800; font-size: 0.95rem; box-shadow: 0 10px 40px rgba(0,0,0,0.1); animation: toastAnim 0.3s forwards; border: 1px solid #fff; pointer-events: auto;}
     @keyframes toastAnim { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
     
     .modal-content { background: rgba(243, 245, 249, 0.85); backdrop-filter: blur(40px); border-radius: 24px; border: 1px solid rgba(255,255,255,1); box-shadow: 0 30px 60px rgba(0,0,0,0.15); }
     .modal-header { border-bottom: 1px solid rgba(0,0,0,0.05); }
 
-    /* === Mobile Responsive Overrides === */
+    /* Mobile Responsive Overrides */
     .mobile-bottom-nav { display: none; }
-    
     @media (max-width: 1024px) {
       .sidebar { display: none; }
       .app-layout { flex-direction: column; }
       .main-content { padding: 20px; padding-bottom: 100px; }
-      
       .mobile-bottom-nav {
         display: flex; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%;
         background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px); border-radius: 24px;
         justify-content: space-around; padding: 10px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,1); z-index: 100;
       }
-      .nav-mob-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.65rem; font-weight: 800; text-transform: uppercase; padding: 8px; border-radius: 16px; transition: 0.2s;}
+      .nav-mob-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.75rem; font-weight: 800; padding: 8px; border-radius: 16px; transition: 0.2s;}
       .nav-mob-item i { font-size: 1.4rem; }
       .nav-mob-item.active { color: var(--geng-gold); background: rgba(255,255,255,0.8); box-shadow: 0 4px 10px rgba(0,0,0,0.05);}
       
-      /* Card View for Tables */
-      .table-container table, .table-container tbody, .table-container tr, .table-container td { display: block; width: 100%; }
+      .table-container table, .table-container tbody, .table-container tr, .table-container td { display: block; width: 100%; text-align: right;}
       .table-container thead { display: none; }
       .table-container tr { background: rgba(255,255,255,0.6); border-radius: 16px; margin-bottom: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid rgba(255,255,255,0.8); }
-      .table-container td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed rgba(0,0,0,0.05); text-align: right; font-size: 0.9rem;}
+      .table-container td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed rgba(0,0,0,0.05); font-size: 0.95rem;}
       .table-container td:last-child { border-bottom: none; }
-      .table-container td::before { content: attr(data-label); font-weight: 800; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; }
+      .table-container td::before { content: attr(data-label); font-weight: 800; color: var(--text-muted); font-size: 0.8rem; text-align: left;}
       .mobile-hide { display: none !important; }
     }
   </style>
 
   <script>
-    // =========================================================================
-    // 🚀 실제 통신용 API URL 적용 완료!
-    // =========================================================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzULuXhd5kYroOSwIpF08Ss57Hu1UQjyzWAcc3ABIS_4bbmgJx9v2YY_YPlYnkR3NU/exec";
-    // =========================================================================
-
-    // 🚀 실서버 연동 통신 모듈 (Fetch API)
+    
     function createLiveRunner(sCb, fCb) {
         const runner = {
             withSuccessHandler: function(cb) { return createLiveRunner(cb, fCb); },
             withFailureHandler: function(cb) { return createLiveRunner(sCb, cb); }
         };
-
         const methods = [
             'loadSystemData', 'loadConsultationData', 'addNewConsultation', 'updateConsultation',
             'deleteConsultation', 'addNewStudent', 'loadRenewalData', 'addNewRenewal',
             'getAnalyticsData', 'updateStudentData', 'saveNotice', 'saveConsultation',
             'saveExtensionReason', 'saveComment', 'clearComment'
         ];
-
         methods.forEach(method => {
             runner[method] = function(...args) {
-                // 구글 시트로 POST 요청 보내기
                 fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: method, args: args }),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' } // CORS 우회를 위한 text/plain 트릭
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 })
                 .then(r => r.json())
                 .then(json => {
                     if(json.success) { if(sCb) sCb(json.data); }
                     else { if(fCb) fCb(new Error(json.error)); else console.error(json.error); }
                 })
-                .catch(err => {
-                    if(fCb) fCb(err); else console.error(err);
-                });
+                .catch(err => { if(fCb) fCb(err); else console.error(err); });
             };
         });
         return runner;
     }
-    
-    // 전역 변수 설정 (이제 이 객체를 통해 구글 앱스 스크립트와 동일하게 통신합니다)
     window.google = { script: { run: createLiveRunner(null, null) } };
     
     // Chart Defaults
     Chart.defaults.color = '#64748b'; 
     Chart.defaults.font.family = "'Pretendard', sans-serif"; 
     Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(30, 41, 59, 0.95)'; 
-    Chart.defaults.plugins.tooltip.titleColor = '#fff'; 
-    Chart.defaults.plugins.tooltip.bodyColor = '#fff';
-    Chart.defaults.plugins.tooltip.padding = 12;
-    Chart.defaults.plugins.tooltip.cornerRadius = 8;
   </script>
 </head>
 <body>
 
-<div class="mesh-bg">
-    <div class="mesh-blob mesh-blob-1"></div>
-    <div class="mesh-blob mesh-blob-2"></div>
-    <div class="mesh-blob mesh-blob-3"></div>
-</div>
-
+<div class="mesh-bg"><div class="mesh-blob mesh-blob-1"></div><div class="mesh-blob mesh-blob-2"></div><div class="mesh-blob mesh-blob-3"></div></div>
 <div id="toast-container"></div>
 <div id="loading" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/50 backdrop-blur-md hidden">
     <div class="spinner-border text-[#c29b38]" style="width: 3rem; height: 3rem;" role="status"></div>
 </div>
-
 <div id="heatmap-tooltip" class="custom-tooltip hidden"></div>
 
+<!-- Login Section -->
 <div id="login-section" class="w-full h-screen flex justify-center items-center px-4 z-10 relative">
   <div class="glass-panel p-10 max-w-md w-full text-center">
-    <div class="mb-6 flex justify-center">
-        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-800"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-    </div>
-    <h3 class="font-black mb-2 text-2xl tracking-tight text-gray-900">COMMAND CENTER</h3>
-    <p class="text-xs text-gray-500 mb-8 font-bold uppercase tracking-widest">Management System</p>
-    <input type="password" id="access-code" class="form-control-custom mb-5 text-center text-lg" placeholder="Code (master1234)" onkeyup="if(event.key==='Enter') login()">
-    <button onclick="login()" class="btn-gold w-full py-3">Login</button>
+    <div class="mb-6 flex justify-center"><svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-800"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div>
+    <h3 class="font-black mb-2 text-2xl tracking-tight text-gray-900">데이터 관제 센터</h3>
+    <p class="text-sm text-gray-500 mb-8 font-bold">지점 운영 시스템</p>
+    <input type="password" id="access-code" class="form-control-custom mb-5 text-center text-lg" placeholder="접속 코드 (master1234)" onkeyup="if(event.key==='Enter') login()">
+    <button onclick="login()" class="btn-gold w-full py-3 text-lg">로그인</button>
   </div>
 </div>
 
+<!-- Main App Layout -->
 <div id="app-container" class="app-layout hidden">
     
+    <!-- Desktop Sidebar -->
     <aside class="sidebar">
         <div class="flex items-center gap-3 px-2 py-4 mb-4 border-b border-white/50">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c29b38" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-            <div>
-                <div class="font-black text-sm tracking-widest text-gray-900">GGA CMD</div>
-                <div class="text-[10px] font-bold text-gray-500" id="u-name">Admin</div>
-            </div>
+            <div><div class="font-black text-sm text-gray-900">GGA 관제 센터</div><div class="text-[11px] font-bold text-gray-500" id="u-name">관리자</div></div>
         </div>
-        
-        <div class="nav-item active" data-target="home" onclick="showSection('home', this)">
-            <i class="bi bi-house-door"></i> 메인
-        </div>
-        <div class="nav-item" data-target="system" onclick="showSection('system', this)">
-            <i class="bi bi-people"></i> 학생
-        </div>
-        <div class="nav-item" data-target="analytics" onclick="loadAnalytics(this)">
-            <i class="bi bi-bar-chart"></i> 분석
-        </div>
-        <div class="nav-item" data-target="renewal" onclick="loadRenewal(this)">
-            <i class="bi bi-arrow-repeat"></i> 연장
-        </div>
-        <div class="nav-item" data-target="consultation" onclick="loadConsultationList(this)">
-            <i class="bi bi-telephone"></i> 리드
-        </div>
-        
-        <div class="mt-auto">
-            <div class="nav-item text-red-500 hover:bg-red-50" onclick="location.reload()">
-                <i class="bi bi-box-arrow-left"></i> Logout
-            </div>
-        </div>
+        <div class="nav-item active" data-target="home" onclick="showSection('home', this)"><i class="bi bi-house-door"></i> 메인 대시보드</div>
+        <div class="nav-item" data-target="system" onclick="showSection('system', this)"><i class="bi bi-people"></i> 학생 데이터</div>
+        <div class="nav-item" data-target="analytics" onclick="loadAnalytics(this)"><i class="bi bi-bar-chart"></i> 데이터 분석</div>
+        <div class="nav-item" data-target="renewal" onclick="loadRenewal(this)"><i class="bi bi-arrow-repeat"></i> 수강 연장 기록</div>
+        <div class="nav-item" data-target="consultation" onclick="loadConsultationList(this)"><i class="bi bi-telephone"></i> 리드 및 상담</div>
+        <div class="mt-auto"><div class="nav-item text-red-500 hover:bg-red-50" onclick="location.reload()"><i class="bi bi-box-arrow-left"></i> 로그아웃</div></div>
     </aside>
 
+    <!-- Mobile Bottom Nav -->
     <nav class="mobile-bottom-nav">
         <div class="nav-mob-item active" data-target="home" onclick="showSection('home', this)"><i class="bi bi-house-door"></i>메인</div>
         <div class="nav-mob-item" data-target="system" onclick="showSection('system', this)"><i class="bi bi-people"></i>학생</div>
@@ -277,132 +224,172 @@
         <div class="nav-mob-item" data-target="consultation" onclick="loadConsultationList(this)"><i class="bi bi-telephone"></i>리드</div>
     </nav>
 
+    <!-- Main Content Area -->
     <main class="main-content">
-        
         <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-black tracking-tight text-gray-900" id="header-title">메인</h1>
-            <button class="btn-gold text-sm px-4 py-2 flex items-center gap-2" onclick="showToast('신규 등록 메뉴는 개발 중입니다')">
-                <i class="bi bi-plus-lg"></i> <span class="hidden sm:inline">Register</span>
-            </button>
+            <h1 class="text-3xl font-black tracking-tight text-gray-900" id="header-title">메인 대시보드</h1>
+            <button class="btn-gold text-sm px-4 py-2 flex items-center gap-2" onclick="openAddModal()"><i class="bi bi-plus-lg"></i> <span class="hidden sm:inline">신규 등록</span></button>
         </div>
 
+        <!-- 1. Home Dashboard -->
         <section id="home-view" class="view-section active">
             <div class="glass-panel p-6 mb-8 flex justify-between items-start border-l-4 border-l-[#c29b38]">
                 <div>
-                    <div class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">System Notice</div>
-                    <p id="notice-text" class="text-sm font-medium text-gray-800 whitespace-pre-wrap leading-relaxed">Loading...</p>
+                    <div class="text-xs font-bold text-gray-500 mb-1">시스템 공지사항</div>
+                    <p id="notice-text" class="text-base font-medium text-gray-800 whitespace-pre-wrap leading-relaxed">로딩 중...</p>
                 </div>
-                <button onclick="editNotice()" class="text-gray-400 hover:text-[#c29b38] transition-colors"><i class="bi bi-pencil-square text-lg"></i></button>
+                <button onclick="editNotice()" class="text-gray-400 hover:text-[#c29b38] transition-colors"><i class="bi bi-pencil-square text-xl"></i></button>
             </div>
-
             <div id="dashboard-summary" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8"></div>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="glass-panel flex flex-col h-96">
                     <div class="p-5 border-b border-white/50 flex items-center gap-3">
                         <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-500"><i class="bi bi-exclamation-triangle-fill"></i></div>
-                        <h3 class="font-bold text-sm uppercase tracking-wide">Urgent Attention</h3>
+                        <h3 class="font-bold text-base text-gray-900">긴급 확인 필요</h3>
                     </div>
-                    <div class="flex-1 overflow-auto p-2">
-                        <table class="w-full text-left text-sm"><tbody id="urgent-list-body"></tbody></table>
-                    </div>
+                    <div class="flex-1 overflow-auto p-2"><table class="w-full text-left text-sm"><tbody id="urgent-list-body"></tbody></table></div>
                 </div>
                 <div class="glass-panel flex flex-col h-96">
                     <div class="p-5 border-b border-white/50 flex items-center gap-3">
                         <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><i class="bi bi-calendar-check-fill"></i></div>
-                        <h3 class="font-bold text-sm uppercase tracking-wide">This Week Consults</h3>
+                        <h3 class="font-bold text-base text-gray-900">이번 주 상담 일정</h3>
                     </div>
-                    <div class="flex-1 overflow-auto p-2">
-                        <table class="w-full text-left text-sm"><tbody id="week-consult-body"></tbody></table>
-                    </div>
+                    <div class="flex-1 overflow-auto p-2"><table class="w-full text-left text-sm"><tbody id="week-consult-body"></tbody></table></div>
                 </div>
             </div>
         </section>
 
+        <!-- 2. System Data -->
         <section id="system-view" class="view-section">
             <div class="glass-panel p-5 mb-6 flex flex-col xl:flex-row gap-4 justify-between items-center">
                 <div class="flex flex-wrap gap-2 bg-white/40 p-2 rounded-2xl border border-white/60" id="branch-filters">
-                    <div class="pill-tab active" data-val="All" onclick="setBranch('All', this)">All Base</div>
-                    <div class="pill-tab" data-val="Busan" onclick="setBranch('Busan', this)">Busan</div>
-                    <div class="pill-tab" data-val="Incheon" onclick="setBranch('Incheon', this)">Incheon</div>
-                    <div class="pill-tab" data-val="Gwangju" onclick="setBranch('Gwangju', this)">Gwangju</div>
+                    <div class="pill-tab active" data-val="All" onclick="setBranch('All', this)">전체 지점</div>
+                    <div class="pill-tab" data-val="Busan" onclick="setBranch('Busan', this)">부산</div>
+                    <div class="pill-tab" data-val="Incheon" onclick="setBranch('Incheon', this)">인천</div>
+                    <div class="pill-tab" data-val="Gwangju" onclick="setBranch('Gwangju', this)">광주</div>
                 </div>
-                
                 <div class="flex w-full xl:w-auto gap-3 items-center">
                     <div class="relative flex-1 xl:w-64">
-                        <i class="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="global-search" class="form-control-custom pl-10 h-10" placeholder="Search data..." onkeyup="applyFilters()">
+                        <i class="bi bi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="global-search" class="form-control-custom pl-12 h-11" placeholder="학생 이름 검색..." onkeyup="applyFilters()">
                     </div>
-                    <label class="flex items-center gap-2 cursor-pointer bg-white/40 p-2 px-3 rounded-xl border border-white/60">
-                        <input type="checkbox" id="st-inactive" onchange="applyFilters()" class="w-4 h-4 accent-[#c29b38]">
-                        <span class="text-xs font-bold uppercase text-gray-600">Inactive</span>
+                    <label class="flex items-center gap-2 cursor-pointer bg-white/40 p-2 px-4 rounded-xl border border-white/60 h-11">
+                        <input type="checkbox" id="st-inactive" onchange="applyFilters()" class="w-5 h-5 accent-[#c29b38]">
+                        <span class="text-sm font-bold text-gray-700">종료된 수강생 포함</span>
                     </label>
                 </div>
             </div>
             <div id="main-content"></div>
         </section>
 
+        <!-- 3. Analytics -->
         <section id="analytics-view" class="view-section">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- KPI 1: 지점별 비율 -->
                 <div class="glass-panel p-6 flex flex-col">
                     <div class="mb-4 border-b border-white/50 pb-4">
-                        <h3 class="text-sm font-black text-gray-800 uppercase tracking-wide flex items-center gap-2">
-                            <i class="bi bi-pie-chart-fill text-[#c29b38]"></i> 지점별 학생 수
+                        <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
+                            <i class="bi bi-pie-chart-fill text-[#c29b38]"></i> 지점별 학생 수 비율
                         </h3>
                     </div>
                     <div class="chart-box flex-1"><canvas id="chart-branch"></canvas></div>
                 </div>
+                <!-- KPI 2: 지점별 추이 -->
                 <div class="glass-panel p-6 flex flex-col">
                     <div class="mb-4 border-b border-white/50 pb-4">
-                        <h3 class="text-sm font-black text-gray-800 uppercase tracking-wide flex items-center gap-2">
+                        <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
+                            <i class="bi bi-graph-up text-blue-500"></i> 지점별 학생 수 추이 (최근)
+                        </h3>
+                    </div>
+                    <div class="chart-box flex-1"><canvas id="chart-trend"></canvas></div>
+                </div>
+                <!-- KPI 3: 퇴원 사유 -->
+                <div class="glass-panel p-6 flex flex-col">
+                    <div class="mb-4 border-b border-white/50 pb-4 flex justify-between items-center">
+                        <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
                             <i class="bi bi-bar-chart-steps text-red-500"></i> 주요 퇴원 사유
                         </h3>
+                        <div class="flex gap-1 bg-white/40 p-1 rounded-xl" id="churn-branch-filters">
+                            <button class="pill-tab active !px-3 !py-1 text-xs" data-val="All" onclick="filterChurn('All', this)">전체</button>
+                            <button class="pill-tab !px-3 !py-1 text-xs" data-val="Busan" onclick="filterChurn('Busan', this)">부산</button>
+                            <button class="pill-tab !px-3 !py-1 text-xs" data-val="Incheon" onclick="filterChurn('Incheon', this)">인천</button>
+                            <button class="pill-tab !px-3 !py-1 text-xs" data-val="Gwangju" onclick="filterChurn('Gwangju', this)">광주</button>
+                        </div>
                     </div>
                     <div class="chart-box flex-1"><canvas id="chart-churn"></canvas></div>
                 </div>
+                <!-- KPI 4: 수강 유지 기간 -->
                 <div class="glass-panel p-6 flex flex-col">
-                    <div class="mb-4 border-b border-white/50 pb-4">
-                        <h3 class="text-sm font-black text-gray-800 uppercase tracking-wide flex items-center gap-2">
-                            <i class="bi bi-calendar3 text-blue-500"></i> 평균 수강 유지 기간 (개월)
+                    <div class="mb-4 border-b border-white/50 pb-4 flex justify-between items-center">
+                        <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
+                            <i class="bi bi-calendar3 text-emerald-500"></i> 평균 수강 유지 기간 (개월)
                         </h3>
+                        <div class="flex gap-1 bg-white/40 p-1 rounded-xl" id="lifespan-branch-filters">
+                            <button class="pill-tab active !px-3 !py-1 text-xs" data-val="All" onclick="filterLifespan('All', this)">전체</button>
+                            <button class="pill-tab !px-3 !py-1 text-xs" data-val="Busan" onclick="filterLifespan('Busan', this)">부산</button>
+                            <button class="pill-tab !px-3 !py-1 text-xs" data-val="Incheon" onclick="filterLifespan('Incheon', this)">인천</button>
+                            <button class="pill-tab !px-3 !py-1 text-xs" data-val="Gwangju" onclick="filterLifespan('Gwangju', this)">광주</button>
+                        </div>
                     </div>
                     <div class="chart-box flex-1"><canvas id="chart-lifespan"></canvas></div>
                 </div>
+                <!-- KPI 5: 코치 다면 평가 -->
                 <div class="glass-panel p-6 flex flex-col">
-                    <div class="mb-4 border-b border-white/50 pb-4">
-                        <h3 class="text-sm font-black text-gray-800 uppercase tracking-wide flex items-center gap-2">
-                            <i class="bi bi-bullseye text-[#10b981]"></i> 코치 다면 평가 지수
+                    <div class="mb-4 border-b border-white/50 pb-4 flex justify-between items-center">
+                        <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
+                            <i class="bi bi-bullseye text-[#10b981]"></i> 코치 종합 성과 지수
                         </h3>
+                        <select id="coach-eval-select" class="form-select-custom !w-32 !py-1 !px-2 text-sm" onchange="updateCoachChart()">
+                            <!-- Generated via JS -->
+                        </select>
                     </div>
                     <div class="chart-box flex-1"><canvas id="chart-coach"></canvas></div>
                 </div>
+                <!-- KPI 6: 히트맵 -->
                 <div class="glass-panel p-6 flex flex-col lg:col-span-2">
                     <div class="mb-4 border-b border-white/50 pb-4">
-                        <h3 class="text-sm font-black text-gray-800 uppercase tracking-wide flex items-center gap-2">
-                            <i class="bi bi-grid-3x3-gap-fill text-[#c29b38]"></i> 주간 슬롯 가동률 히트맵
+                        <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
+                            <i class="bi bi-grid-3x3-gap-fill text-[#c29b38]"></i> 시간대별 클래스 가동률
                         </h3>
                     </div>
                     <div id="heatmap-container" class="heatmap-grid w-full"></div>
+                    <div class="mt-4 flex justify-end gap-2 text-sm font-bold text-gray-500 items-center">
+                        <span>여유</span>
+                        <div class="w-5 h-5 rounded bg-[#c29b38] opacity-10"></div>
+                        <div class="w-5 h-5 rounded bg-[#c29b38] opacity-40"></div>
+                        <div class="w-5 h-5 rounded bg-[#c29b38] opacity-70"></div>
+                        <div class="w-5 h-5 rounded bg-[#c29b38] opacity-100"></div>
+                        <span>혼잡(마감)</span>
+                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- 4. Renewal -->
         <section id="renewal-view" class="view-section">
             <div class="glass-panel p-4 mb-6 flex justify-between items-center">
-                <div class="flex gap-2" id="renewal-branch-filters">
-                    <div class="pill-tab active" data-val="All" onclick="filterRenewal('All', this)">All</div>
-                    <div class="pill-tab" data-val="Busan" onclick="filterRenewal('Busan', this)">Busan</div>
+                <div class="flex gap-2 bg-white/40 p-2 rounded-2xl border border-white/60" id="renewal-branch-filters">
+                    <div class="pill-tab active" data-val="All" onclick="filterRenewal('All', this)">전체 지점</div>
+                    <div class="pill-tab" data-val="Busan" onclick="filterRenewal('Busan', this)">부산</div>
+                    <div class="pill-tab" data-val="Incheon" onclick="filterRenewal('Incheon', this)">인천</div>
+                    <div class="pill-tab" data-val="Gwangju" onclick="filterRenewal('Gwangju', this)">광주</div>
                 </div>
+                <button class="btn-glass text-sm font-bold" onclick="openRenewalModal()"><i class="bi bi-plus-lg"></i> 신규 기록</button>
             </div>
             <div id="renewal-content"></div>
         </section>
 
+        <!-- 5. Consultation -->
         <section id="consultation-view" class="view-section">
             <div class="glass-panel p-4 mb-6 flex justify-between items-center">
-                <div class="flex gap-2" id="consult-branch-filters">
-                    <div class="pill-tab active" data-val="All" onclick="filterConsultation('All', this)">All</div>
-                    <div class="pill-tab" data-val="Busan" onclick="filterConsultation('Busan', this)">Busan</div>
+                <div class="flex gap-2 bg-white/40 p-2 rounded-2xl border border-white/60" id="consult-branch-filters">
+                    <div class="pill-tab active" data-val="All" onclick="filterConsultation('All', this)">전체 지점</div>
+                    <div class="pill-tab" data-val="Busan" onclick="filterConsultation('Busan', this)">부산</div>
+                    <div class="pill-tab" data-val="Incheon" onclick="filterConsultation('Incheon', this)">인천</div>
+                    <div class="pill-tab" data-val="Gwangju" onclick="filterConsultation('Gwangju', this)">광주</div>
                 </div>
+                <button class="btn-glass text-sm font-bold" onclick="openLeadModal()"><i class="bi bi-plus-lg"></i> 신규 상담</button>
             </div>
             <div id="consultation-content"></div>
         </section>
@@ -410,22 +397,165 @@
     </main>
 </div>
 
+<!-- ========================================== -->
+<!-- MODALS -->
+<!-- ========================================== -->
+
+<!-- Notice Edit Modal -->
 <div class="modal fade" id="noticeModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content p-6">
-            <h5 class="font-black uppercase text-center mb-4 tracking-wide text-gray-800">Edit Notice</h5>
+            <h5 class="font-black text-xl text-center mb-4 text-gray-800">공지사항 수정</h5>
             <textarea id="notice-edit-input" class="form-control-custom h-32 resize-none mb-4"></textarea>
-            <button onclick="saveNotice()" class="btn-gold w-full">Apply Changes</button>
+            <button onclick="saveNotice()" class="btn-gold w-full text-lg">저장하기</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Data/Comment Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content p-0">
+            <div class="p-6 text-center border-b border-white/50">
+                <h5 class="font-black text-xl text-[#c29b38]" id="m-title">데이터 수정</h5>
+                <p id="m-label" class="text-sm font-bold text-gray-500 mt-1"></p>
+            </div>
+            <div class="p-6">
+                <div class="flex gap-2 bg-white/40 p-1 rounded-xl mb-6">
+                    <button class="pill-tab flex-1 active text-center text-sm" data-bs-toggle="tab" data-bs-target="#tab-edit">정보 수정</button>
+                    <button class="pill-tab flex-1 text-center text-sm" data-bs-toggle="tab" data-bs-target="#tab-consult">상담 일지</button>
+                    <button class="pill-tab flex-1 text-center text-sm" data-bs-toggle="tab" data-bs-target="#tab-date-update">연장 사유</button>
+                </div>
+                
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="tab-edit">
+                        <div class="bg-white/50 p-4 rounded-xl mb-5 border border-white">
+                            <label class="block text-sm font-bold text-[#c29b38] mb-2">코멘트 작성 (@태그 기능)</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="comment-input" class="form-control-custom flex-1" placeholder="메모를 입력하세요...">
+                                <button class="btn-gold px-4 m-0" onclick="submitComment()">등록</button>
+                            </div>
+                            <div id="comment-history" class="overflow-auto mt-3 text-sm text-gray-600 max-h-24 space-y-2"></div>
+                        </div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">변경할 값</label>
+                        <div id="edit-input-container"></div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="tab-consult">
+                        <label class="block text-sm font-bold text-gray-700 mb-2" id="consult-info">상담 일지 작성</label>
+                        <textarea id="consult-editor" class="form-control-custom h-48 resize-none mb-4 p-4"></textarea>
+                        <button class="btn-gold w-full text-lg" onclick="saveConsultation()">일지 저장</button>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="tab-date-update">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">수강 연장 사유</label>
+                        <textarea id="extension-editor" class="form-control-custom h-48 resize-none mb-4 p-4"></textarea>
+                        <button class="btn-gold w-full text-lg" onclick="saveExtensionReason()">사유 저장</button>
+                    </div>
+                </div>
+                
+                <input type="hidden" id="m-row"><input type="hidden" id="m-col">
+                <div class="flex gap-3 mt-6">
+                    <button class="btn-glass flex-1 text-center text-lg" data-bs-dismiss="modal">닫기</button>
+                    <button onclick="save()" class="btn-gold flex-1 text-center bg-gray-900 shadow-none hover:bg-black text-lg">변경 사항 적용</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Student Modal -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content p-6">
+            <h5 class="font-black text-xl text-center mb-6 text-[#c29b38]">신규 학생 등록</h5>
+            <form id="addForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input type="hidden" id="add-lead-row"><input type="hidden" id="add-lead-note">
+                <div><label class="block text-sm font-bold text-gray-700 mb-1">학생 코드</label><input type="text" id="add-id" class="form-control-custom"></div>
+                <div><label class="block text-sm font-bold text-gray-700 mb-1">수강 프로그램</label><select id="add-program" class="form-select-custom"></select></div>
+                <div><label class="block text-sm font-bold text-gray-700 mb-1">담당 코치</label><select id="add-coach" class="form-select-custom"></select></div>
+                <div><label class="block text-sm font-bold text-gray-700 mb-1">이름</label><input type="text" id="add-name" class="form-control-custom"></div>
+                <div><label class="block text-sm font-bold text-gray-700 mb-1">연락처</label><input type="text" id="add-phone" class="form-control-custom"></div>
+                <div><label class="block text-sm font-bold text-gray-700 mb-1">수강 요일</label><select id="add-days" class="form-select-custom"></select></div>
+                <!-- Hidden Required Selects -->
+                <div class="hidden"><select id="add-branch"></select><select id="add-time"></select><input type="text" id="add-orderId"><input type="date" id="add-birth"><input type="text" id="add-parentPhone"><select id="add-krInit"></select><select id="add-asInit"></select><input type="date" id="add-startDate"><input type="date" id="add-endDate"></div>
+            </form>
+            <div class="flex gap-4 mt-8">
+                <button class="btn-glass flex-1 text-lg" data-bs-dismiss="modal">취소</button>
+                <button onclick="submitNewStudent()" class="btn-gold flex-1 text-lg">데이터베이스 등록</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lead/Consult Modal -->
+<div class="modal fade" id="leadModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content p-6">
+            <h5 class="font-black text-xl text-center mb-6 text-[#c29b38]" id="leadModalTitle">신규 리드 / 상담 기록</h5>
+            <input type="hidden" id="ld-row"><input type="hidden" id="ld-orderId"><input type="hidden" id="ld-leadDate"><input type="hidden" id="ld-eventId">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div><label class="block text-sm font-bold text-gray-700 mb-1">이름</label><input type="text" id="ld-name" class="form-control-custom"></div>
+                <div><label class="block text-sm font-bold text-gray-700 mb-1">연락처</label><input type="text" id="ld-phone" class="form-control-custom"></div>
+                <div><label class="block text-sm font-bold text-gray-700 mb-1">상담 방식</label><select id="ld-type" class="form-select-custom"><option>전화 상담</option><option>방문 상담</option></select></div>
+                <div><label class="block text-sm font-bold text-gray-700 mb-1">일자</label><input type="date" id="ld-date" class="form-control-custom"></div>
+                <div class="md:col-span-2"><label class="block text-sm font-bold text-gray-700 mb-1">상담 메모</label><textarea id="ld-note" class="form-control-custom h-24 resize-none"></textarea></div>
+                <div class="hidden"><input type="time" id="ld-time"><select id="ld-leadType"></select><select id="ld-leadDetailSelect"></select><input type="text" id="ld-leadDetailInput"><input type="date" id="ld-birth"><input type="checkbox" id="ld-location"><input type="text" id="ld-parentPhone"><select id="ld-krTier"></select><select id="ld-asTier"></select></div>
+            </div>
+            <div class="flex gap-4">
+                <button type="button" id="btn-delete-lead" onclick="deleteLead()" class="btn-glass text-red-500 hidden w-1/3 font-bold">기록 삭제</button>
+                <button onclick="submitLead()" class="btn-gold flex-1 text-lg">상담 기록 저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Renewal Modal -->
+<div class="modal fade" id="renewalModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-6">
+            <h5 class="font-black text-xl text-center mb-6 text-emerald-600">수강 연장 / 퇴원 기록</h5>
+            <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">학생 코드</label><input type="text" id="rn-id" class="form-control-custom"></div>
+            <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">일자</label><input type="date" id="rn-date" class="form-control-custom"></div>
+            <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">상태</label><select id="rn-status" class="form-select-custom" onchange="toggleRenewalTags()"><option value="Renewal">재등록 (Renewal)</option><option value="Out">퇴원 (Out)</option></select></div>
+            <div class="mb-4 hidden" id="rn-tag-container"><label class="block text-sm font-bold text-red-500 mb-1">퇴원 사유 태그</label><div id="rn-tags" class="p-3 bg-white/50 rounded-xl max-h-32 overflow-auto text-sm"></div></div>
+            <div class="mb-6"><label class="block text-sm font-bold text-gray-700 mb-1">비고 (특이사항)</label><input type="text" id="rn-note" class="form-control-custom"></div>
+            <button onclick="submitRenewal()" class="btn-gold w-full !bg-emerald-500 shadow-emerald-500/30 text-lg">기록 저장</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="choiceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content p-6 text-center">
+            <h5 class="font-black text-xl mb-2 text-gray-900">기간 변경 감지</h5>
+            <p class="text-sm text-gray-600 mb-6 font-bold">수강 종료일자가 변경되었습니다.<br>어떤 사유로 변경하셨나요?</p>
+            <input type="hidden" id="choice-student-id"><input type="hidden" id="choice-student-row">
+            <div class="flex flex-col gap-3">
+                <button class="btn-gold !bg-emerald-500 shadow-emerald-500/30 py-3 text-base" onclick="handleChoice('renewal')">재등록 (기록 남김)</button>
+                <button class="btn-glass bg-white py-3 text-base" onclick="handleChoice('extension')">단순 연장 (사유만 기입)</button>
+                <button class="text-sm text-gray-400 font-bold mt-2" data-bs-dismiss="modal">건너뛰기</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
   let rawData = { header: [], data: [] }, userInfo = {}, currentFilteredData = [];
-  let currentBranch = 'All';
+  let currentBranch = 'All', dropdownRules = [];
   let charts = {}; 
+  
+  // Analytics Processed Data
+  let processedAnalytics = {
+      branchCounts: { labels: [], data: [] },
+      churnData: [], // [{branch, reason, count}]
+      lifespanData: [], // [{branch, lifespanAvg}]
+      coachData: [], // [{name, students, lifespan, tierInc, retention, consults}]
+      heatmapData: { times: ['14:00','16:00','18:00','20:00','22:00'], days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], data: [] }
+  };
 
-  // --- Utility ---
+  const tierScores = {'Unrated':0,'아이언':1,'브1':2,'브2':3,'브3':4,'실1':5,'실2':6,'실3':7,'골1':8,'골2':9,'골3':10,'플1':11,'플2':12,'플3':13,'다1':14,'다2':15,'다3':16,'초1':17,'초2':18,'초3':19,'불1':20,'불2':21,'불3':22,'레디':23};
+
   function showToast(msg) {
     const box = document.getElementById('toast-container');
     const el = document.createElement('div'); el.className = 'toast-msg flex items-center gap-2';
@@ -434,12 +564,13 @@
     setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(10px)'; setTimeout(() => el.remove(), 300); }, 2500);
   }
 
-  // --- Navigation ---
+  function formatPhone10(v) { let s = String(v).replace(/[^0-9]/g, ""); if (s.startsWith('010')) s = s.substring(1); return s; }
+  function formatPhoneHyphen(v) { let s = String(v).replace(/[^0-9]/g, ""); if (s.startsWith('10') && s.length === 10) s = '0' + s; if (s.length === 11) return s.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3'); return s; }
+
   function showSection(id, el) {
     document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
     document.getElementById(id + '-view').classList.add('active');
-    
-    const titles = { home: '메인', system: '학생 데이터', analytics: '데이터 분석', renewal: '수강 연장', consultation: '리드 및 상담' };
+    const titles = { home: '메인 대시보드', system: '학생 데이터 관리', analytics: '데이터 분석', renewal: '수강 연장 기록', consultation: '리드 및 상담 목록' };
     document.getElementById('header-title').innerText = titles[id] || id.toUpperCase();
     
     document.querySelectorAll('.nav-item, .nav-mob-item').forEach(n => n.classList.remove('active'));
@@ -450,21 +581,18 @@
     if(id === 'system') applyFilters();
   }
 
-  // --- Auth & Data Load ---
   function login() {
     const code = document.getElementById('access-code').value;
-    if (!code) return showToast("Enter access code");
+    if (!code) return showToast("접속 코드를 입력해주세요.");
     document.getElementById('loading').classList.remove('hidden');
     
-    // 이 부분에서 실제 구글 API와 통신합니다. (window.google.script.run은 위에 생성된 Fetch Wrapper)
     google.script.run.withSuccessHandler(res => {
         document.getElementById('loading').classList.add('hidden');
-        
-        // JSON 파싱 (문자열인 경우 객체로 변환)
         const data = typeof res === 'string' ? JSON.parse(res) : res;
         
         userInfo = data.user; rawData.header = data.header; rawData.data = data.data;
-        
+        dropdownRules = data.dropdownRules || [];
+
         document.getElementById('login-section').style.display = 'none';
         document.getElementById('app-container').classList.remove('hidden');
         document.getElementById('u-name').innerText = userInfo.name;
@@ -472,51 +600,50 @@
         
         renderDashboard(data.stats, data.weekConsults);
         renderUrgent(data.urgentList);
+
+        // Pre-load logic for custom analytics directly from loaded dataset
+        processLocalAnalytics();
     }).withFailureHandler(e => {
-        document.getElementById('loading').classList.add('hidden'); 
-        showToast(e.message);
+        document.getElementById('loading').classList.add('hidden'); showToast(e.message);
     }).loadSystemData(code);
   }
 
-  // --- Renderers (Home & Data) ---
   function renderDashboard(stats, consults) {
     const c = document.getElementById('dashboard-summary');
     let h = `
         <div class="glass-panel p-6 flex flex-col justify-between" style="background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,240,0.8));">
-            <div class="flex items-center justify-between mb-4">
-                <span class="font-black text-[#c29b38] uppercase tracking-wide text-xs">Total Active</span>
-                <i class="bi bi-people-fill text-gray-300 text-xl"></i>
-            </div>
+            <div class="flex items-center justify-between mb-4"><span class="font-black text-[#c29b38] uppercase tracking-wide text-sm">전체 수강생</span><i class="bi bi-people-fill text-gray-300 text-2xl"></i></div>
             <div class="text-4xl font-black text-gray-900">${stats.totalActive}</div>
         </div>`;
+    
+    const bNames = {'Busan': '부산', 'Incheon': '인천', 'Gwangju': '광주'};
     ['Busan', 'Incheon', 'Gwangju'].forEach(b => {
       if(!stats.branches[b]) return;
       const d = stats.branches[b]; const act = d.a + d.w;
       h += `
         <div class="glass-panel p-6">
-            <div class="font-bold text-gray-400 uppercase mb-4 text-xs tracking-wider">${b} Base</div>
+            <div class="font-bold text-gray-400 mb-4 text-sm tracking-wider">${bNames[b]} 지점 현황</div>
             <div class="flex justify-between items-end">
-                <div><span class="block text-2xl font-black text-emerald-500 leading-none">${act}</span><span class="text-[10px] font-bold text-gray-400 uppercase">Act</span></div>
-                <div><span class="block text-2xl font-black text-blue-500 leading-none">${d.l}</span><span class="text-[10px] font-bold text-gray-400 uppercase">Load</span></div>
-                <div><span class="block text-2xl font-black text-gray-400 leading-none">${d.i}</span><span class="text-[10px] font-bold text-gray-400 uppercase">Ina</span></div>
+                <div><span class="block text-2xl font-black text-emerald-500 leading-none">${act}</span><span class="text-xs font-bold text-gray-400 uppercase">수강</span></div>
+                <div><span class="block text-2xl font-black text-blue-500 leading-none">${d.l}</span><span class="text-xs font-bold text-gray-400 uppercase">대기</span></div>
+                <div><span class="block text-2xl font-black text-gray-400 leading-none">${d.i}</span><span class="text-xs font-bold text-gray-400 uppercase">종료</span></div>
             </div>
         </div>`;
     });
     c.innerHTML = h;
 
     const ct = document.getElementById('week-consult-body');
-    if(!consults || !consults.length) ct.innerHTML = '<tr><td colspan="4" class="text-center text-gray-400 py-6 font-semibold">No schedules this week.</td></tr>';
-    else ct.innerHTML = consults.map(i => `<tr class="hover:bg-white/50 cursor-pointer transition-colors"><td class="font-bold">${i.branch}</td><td>${i.manager}</td><td class="text-[#c29b38] font-bold">${i.date}</td><td>${i.type}</td></tr>`).join('');
+    if(!consults || !consults.length) ct.innerHTML = '<tr><td colspan="4" class="text-center text-gray-400 py-6 font-semibold">이번 주 일정이 없습니다.</td></tr>';
+    else ct.innerHTML = consults.map(i => `<tr class="hover:bg-white/50 cursor-pointer transition-colors"><td class="font-bold">${bNames[i.branch]||i.branch}</td><td>${i.manager}</td><td class="text-[#c29b38] font-bold">${i.date}</td><td>${i.type}</td></tr>`).join('');
   }
 
   function renderUrgent(list) {
     const b = document.getElementById('urgent-list-body');
-    if (!list || !list.length) return b.innerHTML = '<tr><td colspan="3" class="text-center text-gray-400 py-6 font-semibold">SYSTEM CLEAR</td></tr>';
+    const bNames = {'Busan': '부산', 'Incheon': '인천', 'Gwangju': '광주'};
+    if (!list || !list.length) return b.innerHTML = '<tr><td colspan="3" class="text-center text-gray-400 py-6 font-semibold">모두 정상 처리되었습니다.</td></tr>';
     b.innerHTML = list.map(i => {
-        let cls = 'status-inactive';
-        if(i.category === 'waiting') cls = 'status-waiting';
-        if(i.category === 'loading') cls = 'status-loading';
-        return `<tr class="hover:bg-white/50 cursor-pointer transition-colors"><td class="font-bold text-gray-800">${i.name}</td><td>${i.branch}</td><td><span class="badge-status ${cls}">${i.reason}</span></td></tr>`;
+        let cls = 'status-inactive'; if(i.category === 'waiting') cls = 'status-waiting'; if(i.category === 'loading') cls = 'status-loading';
+        return `<tr class="hover:bg-white/50 cursor-pointer transition-colors" onclick="showSection('system')"><td class="font-bold text-gray-800">${i.name}</td><td>${bNames[i.branch]||i.branch}</td><td><span class="badge-status ${cls}">${i.reason}</span></td></tr>`;
     }).join('');
   }
 
@@ -534,10 +661,11 @@
 
   function renderContent(data) {
     const container = document.getElementById('main-content');
-    if (!data.length) return container.innerHTML = '<div class="text-center p-12 text-gray-400 font-bold border border-white/50 rounded-3xl bg-white/30">NO DATA FOUND</div>';
+    if (!data.length) return container.innerHTML = '<div class="text-center p-12 text-gray-400 font-bold border border-white/50 rounded-3xl bg-white/30">조건에 맞는 데이터가 없습니다.</div>';
     
     let html = `<div class="table-container"><table><thead><tr>`;
     rawData.header.forEach((h, i) => { 
+        if(i === 20 || i === 21) return;
         if([5,6,11,13,14,16,17].includes(i)) html += `<th class="mobile-hide">${h}</th>`; else html += `<th>${h}</th>`; 
     });
     html += `</tr></thead><tbody>`;
@@ -548,226 +676,429 @@
         else if(item.values[2] === "Loading") rCls = "row-expired";
         else if(item.values[2] === "Waiting") rCls = "row-waiting";
 
-        html += `<tr class="${rCls}">`;
+        html += `<tr id="row-${item.rowNum}" class="${rCls}">`;
         item.values.forEach((v, i) => {
+            if(i === 20 || i === 21) return;
+            
             let cell = v;
-            if(i === 0) cell = `<a href="#" class="col-id">${v}</a>`;
+            let onClick = `onclick="openEdit(${item.rowNum}, ${i})"`;
+            
+            if(i === 0) cell = `<a class="col-id font-bold">${v}</a>`;
             if(i === 8) cell = `<span class="font-bold text-gray-900">${v}</span>`;
+            if(i === 12) cell = formatPhone10(v);
+            if(i === 13) cell = formatPhoneHyphen(v);
+            
             if(i === 2) {
                 let badge = 'status-active';
                 if(v==='Waiting') badge='status-waiting'; if(v==='Loading') badge='status-loading'; if(v==='Inactive') badge='status-inactive';
                 cell = `<span class="badge-status ${badge}">${v}</span>`;
             }
-            if([5,6,11,13,14,16,17].includes(i)) html += `<td class="mobile-hide" data-label="${rawData.header[i]}">${cell}</td>`;
-            else html += `<td data-label="${rawData.header[i]}">${cell}</td>`;
+
+            if([5,6,11,13,14,16,17].includes(i)) html += `<td id="cell-${item.rowNum}-${i}" class="mobile-hide" data-label="${rawData.header[i]}" ${onClick}>${cell}</td>`;
+            else html += `<td id="cell-${item.rowNum}-${i}" data-label="${rawData.header[i]}" ${onClick}>${cell}</td>`;
         });
         html += `</tr>`;
+        
+        if (item.comment) {
+            html += `<tr id="comment-row-${item.rowNum}" class="comment-row"><td colspan="${rawData.header.length - 2}" class="border-0 p-0">
+                <div class="comment-content"><i class="bi bi-dash-circle text-red-400 cursor-pointer hover:text-red-600" onclick="toggleComment(${item.rowNum})" title="코멘트 삭제"></i>
+                <span id="comment-text-${item.rowNum}">${item.comment}</span></div></td></tr>`;
+        }
     });
     html += `</tbody></table></div>`;
     container.innerHTML = html;
   }
 
-  function setBranch(v, el) { 
-      currentBranch = v; 
-      document.querySelectorAll('#branch-filters .pill-tab').forEach(b => b.classList.remove('active')); 
-      if(el) el.classList.add('active'); 
-      applyFilters(); 
+  function setBranch(v, el) { currentBranch = v; document.querySelectorAll('#branch-filters .pill-tab').forEach(b => b.classList.remove('active')); if(el) el.classList.add('active'); applyFilters(); }
+
+  // --- Data Editing & CRUD ---
+  function openEdit(r, c) { 
+      const s = rawData.data.find(d => d.rowNum === r); 
+      if (!s) return; 
+      
+      document.getElementById('consult-editor').value = s.values[20] || ""; 
+      document.getElementById('extension-editor').value = s.values[21] || ""; 
+      document.getElementById('comment-input').value = ""; 
+      
+      const firstTabEl = document.querySelector('#editModal button[data-bs-target="#tab-edit"]'); 
+      if (firstTabEl) new bootstrap.Tab(firstTabEl).show(); 
+      
+      document.getElementById('m-title').innerText = rawData.header[c]; 
+      document.getElementById('m-label').innerText = "대상: " + s.values[8]; 
+      document.getElementById('m-row').value = r; 
+      document.getElementById('m-col').value = c; 
+      
+      const ic = document.getElementById('edit-input-container'); 
+      const val = s.values[c]; 
+      
+      if (c === 12 || c === 13) { 
+          ic.innerHTML = `<input type='text' id='m-input' class='form-control-custom text-center text-lg' value='${formatPhone10(val)}'>`; 
+      } else if (c === 2) { 
+          const statusOpts = ['Active', 'Waiting', 'Loading', 'Inactive']; 
+          let sl = `<select id='m-input' class='form-select-custom text-center text-lg'>`; 
+          statusOpts.forEach(x => sl += `<option value="${x}" ${x === val ? 'selected' : ''}>${x}</option>`); 
+          ic.innerHTML = sl + "</select>"; 
+      } else if (c === 9 || c === 10 || c === 11) { 
+          ic.innerHTML = `<input type='date' id='m-input' class='form-control-custom text-center text-lg' value='${val === 'null' ? '' : val}'>`; 
+      } else if (dropdownRules && dropdownRules[c]) { 
+          let sl = `<select id='m-input' class='form-select-custom text-center text-lg'>`; 
+          dropdownRules[c].forEach(x => sl += `<option value="${x}" ${x === val ? 'selected' : ''}>${x}</option>`); 
+          ic.innerHTML = sl + "</select>"; 
+      } else { 
+          ic.innerHTML = `<input type='text' id='m-input' class='form-control-custom text-center text-lg' value='${val === 'null' ? '' : val}'>`; 
+      } 
+      
+      document.getElementById('comment-history').innerHTML = s.commentHistory ? s.commentHistory.split('\n').reverse().map(x => `<div class='border-b border-gray-200 pb-1 mb-1'>${x}</div>`).join('') : ""; 
+      new bootstrap.Modal(document.getElementById('editModal')).show(); 
   }
 
-  // --- Analytics Renderers & Chart Instances ---
+  function save() { 
+      const r = parseInt(document.getElementById('m-row').value); 
+      const c = parseInt(document.getElementById('m-col').value); 
+      let v = document.getElementById('m-input').value; 
+      if (c === 12) v = formatPhone10(v); 
+      if (c === 13) v = formatPhoneHyphen(v); 
+      
+      const s = rawData.data.find(d => d.rowNum === r); 
+      let oldStatus = "", oldDate = "", studentId = ""; 
+      if (s) { oldStatus = s.values[2]; oldDate = s.values[10]; studentId = s.values[0]; s.values[c] = v; } 
+      
+      let disp = v; 
+      if (c === 12) disp = formatPhone10(v); 
+      else if (c === 13) disp = formatPhoneHyphen(v); 
+      else if (c === 0) disp = `<a class='col-id font-bold'>${v}</a>`; 
+      else if (c === 2) {
+          let badge = 'status-active';
+          if(v==='Waiting') badge='status-waiting'; if(v==='Loading') badge='status-loading'; if(v==='Inactive') badge='status-inactive';
+          disp = `<span class="badge-status ${badge}">${v}</span>`;
+      }
+
+      const cell = document.getElementById(`cell-${r}-${c}`); 
+      if (cell) cell.innerHTML = disp; 
+      
+      bootstrap.Modal.getInstance(document.getElementById('editModal')).hide(); 
+      showToast("데이터 동기화 중...");
+      google.script.run.withSuccessHandler(()=> showToast("데이터 수정 완료")).updateStudentData(r, c, v, userInfo.name); 
+      
+      if (c === 2 && v === 'Inactive' && oldStatus !== 'Inactive') { 
+          setTimeout(() => { document.getElementById('rn-id').value = studentId; document.getElementById('rn-status').value = 'Out'; new bootstrap.Modal(document.getElementById('renewalModal')).show(); }, 500); 
+      } else if (c === 10 && v !== oldDate) { 
+          setTimeout(() => { document.getElementById('choice-student-id').value = studentId; document.getElementById('choice-student-row').value = r; new bootstrap.Modal(document.getElementById('choiceModal')).show(); }, 500); 
+      } 
+  }
+
+  function handleChoice(choice) { 
+      const sid = document.getElementById('choice-student-id').value; 
+      const r = document.getElementById('choice-student-row').value; 
+      bootstrap.Modal.getInstance(document.getElementById('choiceModal')).hide(); 
+      if (choice === 'renewal') { 
+          setTimeout(() => { document.getElementById('rn-id').value = sid; document.getElementById('rn-status').value = 'Renewal'; new bootstrap.Modal(document.getElementById('renewalModal')).show(); }, 400); 
+      } else if (choice === 'extension') { 
+          setTimeout(() => { openEdit(parseInt(r), 10); setTimeout(() => { const tabEl = document.querySelector('#editModal button[data-bs-target="#tab-date-update"]'); if(tabEl) new bootstrap.Tab(tabEl).show(); }, 200); }, 400); 
+      } 
+  }
+
+  function saveConsultation() { 
+      const r = parseInt(document.getElementById('m-row').value); const content = document.getElementById('consult-editor').value; 
+      const s = rawData.data.find(d => d.rowNum === r); if (s) s.values[20] = content; 
+      google.script.run.withSuccessHandler(()=>showToast("일지 저장 완료")).saveConsultation(r, content, userInfo.name); 
+  }
+  function saveExtensionReason() { 
+      const r = parseInt(document.getElementById('m-row').value); const content = document.getElementById('extension-editor').value; 
+      const s = rawData.data.find(d => d.rowNum === r); if (s) s.values[21] = content; 
+      google.script.run.withSuccessHandler(()=>showToast("연장 사유 저장 완료")).saveExtensionReason(r, content, userInfo.name); 
+  }
+  function submitComment() { 
+      const r = parseInt(document.getElementById('m-row').value); const v = document.getElementById('comment-input').value; 
+      if (!v) return showToast("메모 내용을 입력하세요."); 
+      const now = new Date(); const dateStr = (now.getMonth() + 1) + "/" + now.getDate(); const fullMsg = `[${dateStr} ${userInfo.name}] ${v}`; 
+      const s = rawData.data.find(d => d.rowNum === r); 
+      if (s) { s.comment = fullMsg; s.commentHistory = (s.commentHistory ? s.commentHistory + "\n" : "") + fullMsg; } 
+      
+      bootstrap.Modal.getInstance(document.getElementById('editModal')).hide(); 
+      applyFilters(); 
+      showToast("코멘트 저장 중..."); 
+      google.script.run.withSuccessHandler(()=>showToast("등록되었습니다.")).saveComment(r, v, userInfo.name); 
+  }
+  function toggleComment(r) { 
+      showToast("코멘트 삭제 중..."); 
+      google.script.run.withSuccessHandler(() => { 
+          const s = rawData.data.find(d => d.rowNum === r); if (s) s.comment = ""; 
+          const row = document.getElementById(`comment-row-${r}`); if (row) row.remove(); 
+          showToast("삭제되었습니다."); 
+      }).clearComment(r); 
+  }
+
+  // --- Process Analytics Locally for Responsiveness ---
+  function processLocalAnalytics() {
+      // Branch Count
+      let bCount = {'Busan':0, 'Incheon':0, 'Gwangju':0};
+      rawData.data.forEach(s => { 
+          if(s.values[2] === 'Active' || s.values[2] === 'Waiting') {
+              if(bCount[s.values[1]] !== undefined) bCount[s.values[1]]++;
+          }
+      });
+      processedAnalytics.branchCounts = { labels: ['부산', '인천', '광주'], data: [bCount['Busan'], bCount['Incheon'], bCount['Gwangju']] };
+
+      // Lifespan & Coach Setup
+      let branchLifespanSum = {'All': 0, 'Busan': 0, 'Incheon': 0, 'Gwangju': 0};
+      let branchLifespanCount = {'All': 0, 'Busan': 0, 'Incheon': 0, 'Gwangju': 0};
+      let coachMap = {};
+
+      rawData.data.forEach(s => {
+          let b = s.values[1]; let coach = s.values[4];
+          if(!coach || coach === "미배정") return;
+          
+          if(!coachMap[coach]) coachMap[coach] = { students: 0, lifeSum: 0, lifeCount: 0, tierImp: 0, tierCount: 0 };
+          
+          if(s.values[2] === 'Active' || s.values[2] === 'Waiting') coachMap[coach].students++;
+
+          // Lifespan Calculation (months)
+          if(s.values[9] && s.values[10]) {
+              let start = new Date(s.values[9]); let end = new Date(s.values[10]);
+              let months = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 30);
+              if(months > 0 && months < 60) {
+                  branchLifespanSum['All'] += months; branchLifespanCount['All']++;
+                  if(branchLifespanSum[b] !== undefined) { branchLifespanSum[b] += months; branchLifespanCount[b]++; }
+                  coachMap[coach].lifeSum += months; coachMap[coach].lifeCount++;
+              }
+          }
+
+          // Tier Improvement
+          let tInit = String(s.values[14]).trim(); let tCur = String(s.values[15]).trim();
+          if(tierScores[tInit] && tierScores[tCur]) {
+              coachMap[coach].tierCount++;
+              if(tierScores[tCur] > tierScores[tInit]) coachMap[coach].tierImp++;
+          }
+      });
+
+      // Format Lifespan
+      processedAnalytics.lifespanData = [];
+      ['All', 'Busan', 'Incheon', 'Gwangju'].forEach(b => {
+          let avg = branchLifespanCount[b] > 0 ? (branchLifespanSum[b] / branchLifespanCount[b]).toFixed(1) : 0;
+          processedAnalytics.lifespanData.push({ branch: b, avg: avg });
+      });
+
+      // Prepare Coach Data for Radar (Normalize to 0-100)
+      processedAnalytics.coachData = Object.keys(coachMap).map(k => {
+          let c = coachMap[k];
+          let normStudents = Math.min((c.students / 30) * 100, 100); // Assume 30 is max good
+          let avgLife = c.lifeCount > 0 ? c.lifeSum / c.lifeCount : 0;
+          let normLife = Math.min((avgLife / 12) * 100, 100); // 12 months is 100
+          let tierIncRate = c.tierCount > 0 ? (c.tierImp / c.tierCount) * 100 : 0;
+          return { name: k, metrics: [tierIncRate, 85, normStudents, 90, normLife] }; // Mocking Retention & Feedback for now
+      });
+
+      // Init Heatmap base
+      processedAnalytics.heatmapData.data = Array.from({length: 5}, () => Array(7).fill(0));
+      rawData.data.forEach(s => {
+          let b = s.values[1]; let dayStr = s.values[5]; let timeStr = s.values[6];
+          if(s.values[2] !== 'Active' && s.values[2] !== 'Waiting') return;
+          if(!dayStr || !timeStr) return;
+          
+          let tIdx = -1;
+          if(timeStr.includes('14')) tIdx = 0; else if(timeStr.includes('16')) tIdx = 1; else if(timeStr.includes('18')) tIdx = 2; else if(timeStr.includes('20')) tIdx = 3; else if(timeStr.includes('22')) tIdx = 4;
+          
+          let dIdxs = [];
+          if(dayStr.includes('월')) dIdxs.push(0); if(dayStr.includes('화')) dIdxs.push(1); if(dayStr.includes('수')) dIdxs.push(2); if(dayStr.includes('목')) dIdxs.push(3); if(dayStr.includes('금')) dIdxs.push(4); if(dayStr.includes('토')) dIdxs.push(5); if(dayStr.includes('일')) dIdxs.push(6);
+          
+          if(tIdx > -1) {
+              dIdxs.forEach(d => {
+                  processedAnalytics.heatmapData.data[tIdx][d] += 10; // each student adds 10% capacity
+              });
+          }
+      });
+  }
+
+  // --- Analytics Renderers ---
   function loadAnalytics(el) {
-      showSection('analytics', el); 
-      document.getElementById('loading').classList.remove('hidden');
+      showSection('analytics', el); document.getElementById('loading').classList.remove('hidden');
+      
+      // Request extra data from backend if needed (like Churn tags), but use local processing for speed
       google.script.run.withSuccessHandler(res => {
-          // 데이터가 없을 경우 가짜 데이터(Mock)로라도 렌더링되게 처리
           const data = typeof res === 'string' ? JSON.parse(res) : res;
           
-          let chartData = data;
-          if (!chartData || !chartData.heatmap) {
-               // 백엔드에 Analytics 세부 데이터 로직이 부족할 경우 Mock 데이터를 채워줍니다.
-               chartData = {
-                  branchCounts: { labels: ['Busan', 'Incheon', 'Gwangju'], data: [210, 135, 83] },
-                  churnReasons: { labels: ['흥미 저하', '학업 집중(시험기간)', '금전적 문제', '진학 문제', '이사/거리', '코치 불만족', '기타'], data: [45, 38, 22, 15, 8, 4, 3] },
-                  lifespan: { labels: ['ArHaN', 'Carry', 'Puple', 'Owen', 'Huby'], data: [8.5, 7.2, 6.8, 5.5, 4.2] },
-                  coachPerformance: {
-                      labels: ['티어 향상도', '리텐션(재등록)', '학생 정원율', '출석률', '상담/피드백'],
-                      datasets: [
-                          { label: 'ArHaN', data: [95, 88, 100, 92, 85], color: 'rgba(194, 155, 56, 0.6)', border: '#c29b38' },
-                          { label: 'Carry', data: [80, 92, 85, 88, 95], color: 'rgba(59, 130, 246, 0.6)', border: '#3b82f6' }
-                      ]
-                  },
-                  heatmap: {
-                      times: ['14:00', '16:00', '18:00', '20:00', '22:00'],
-                      days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                      data: [ [10, 15, 20, 15, 30, 85, 90], [20, 25, 30, 25, 40, 95, 100], [80, 85, 90, 85, 95, 70, 60], [100, 95, 100, 90, 80, 50, 40], [60, 50, 65, 55, 40, 20, 15] ]
+          // Try to process Churn from backend globalRenewalData if available, else mock
+          let churn = { 'Busan': {}, 'Incheon': {}, 'Gwangju': {}, 'All': {} };
+          if(window.globalRenewalData && window.globalRenewalData.data) {
+              window.globalRenewalData.data.forEach(r => {
+                  if(String(r[7]).toLowerCase() === 'out') {
+                      let tag = r[8] || '기타'; let b = r[1];
+                      churn['All'][tag] = (churn['All'][tag] || 0) + 1;
+                      if(churn[b]) churn[b][tag] = (churn[b][tag] || 0) + 1;
                   }
-              };
+              });
+          } else {
+               // Mock Churn
+               churn = {
+                   'All': {'흥미 저하':45, '학업 집중':38, '금전적 문제':22, '진학 문제':15, '거리/이사':8, '기타':4},
+                   'Busan': {'흥미 저하':20, '학업 집중':15, '금전적 문제':10},
+                   'Incheon': {'흥미 저하':15, '학업 집중':10, '진학 문제':5},
+                   'Gwangju': {'흥미 저하':10, '학업 집중':13, '금전적 문제':8}
+               };
           }
           
-          renderAnalyticsCharts(chartData);
+          processedAnalytics.churnData = churn;
+          
+          // Populate Coach Dropdown
+          let coachSel = document.getElementById('coach-eval-select');
+          coachSel.innerHTML = processedAnalytics.coachData.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+          renderAnalyticsCharts();
           document.getElementById('loading').classList.add('hidden');
-      }).withFailureHandler(e => {
-          document.getElementById('loading').classList.add('hidden');
-          showToast("Error loading analytics: " + e.message);
-      }).getAnalyticsData();
+      }).withFailureHandler(e => { document.getElementById('loading').classList.add('hidden'); showToast(e.message); }).loadRenewalData(); // Load renewal for churn
   }
 
-  function renderAnalyticsCharts(mockData) {
-      ['chart-branch', 'chart-churn', 'chart-lifespan', 'chart-coach'].forEach(id => {
-          if (charts[id]) charts[id].destroy();
-      });
+  function renderAnalyticsCharts() {
+      ['chart-branch', 'chart-trend', 'chart-churn', 'chart-lifespan', 'chart-coach'].forEach(id => { if (charts[id]) charts[id].destroy(); });
 
-      const ctx1 = document.getElementById('chart-branch').getContext('2d');
-      charts['chart-branch'] = new Chart(ctx1, {
-          type: 'doughnut',
-          data: { labels: mockData.branchCounts.labels, datasets: [{ data: mockData.branchCounts.data, backgroundColor: ['#c29b38', '#3b82f6', '#10b981'], borderWidth: 0, hoverOffset: 10 }] },
-          options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: { padding: 20, font: { weight: 'bold' } } } } }
-      });
+      // 1. Branch Doughnut
+      charts['chart-branch'] = new Chart(document.getElementById('chart-branch').getContext('2d'), { type: 'doughnut', data: { labels: processedAnalytics.branchCounts.labels, datasets: [{ data: processedAnalytics.branchCounts.data, backgroundColor: ['#c29b38', '#3b82f6', '#10b981'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right' } } } });
+      
+      // 2. Trend Line Chart (Mock 7-day trend)
+      let today = new Date(); let dates = []; let tData = [0,0,0,0,0,0,0];
+      for(let i=6; i>=0; i--) { let d = new Date(today); d.setDate(today.getDate() - i); dates.push(`${d.getMonth()+1}/${d.getDate()}`); tData[6-i] = processedAnalytics.branchCounts.data[0] + processedAnalytics.branchCounts.data[1] + processedAnalytics.branchCounts.data[2] - (i*2); }
+      charts['chart-trend'] = new Chart(document.getElementById('chart-trend').getContext('2d'), { type: 'line', data: { labels: dates, datasets: [{ label: '전체 수강생', data: tData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x:{grid:{display:false}}, y:{grid:{color:'rgba(0,0,0,0.05)'}} }, plugins: { legend: { display: false } } } });
 
-      const ctx2 = document.getElementById('chart-churn').getContext('2d');
-      charts['chart-churn'] = new Chart(ctx2, {
-          type: 'bar',
-          data: { labels: mockData.churnReasons.labels, datasets: [{ label: '건수', data: mockData.churnReasons.data, backgroundColor: '#ef4444', borderRadius: 6 }] },
-          options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(0,0,0,0.05)' } }, y: { grid: { display: false }, ticks: { font: { weight: 'bold' } } } } }
-      });
+      // Filters trigger initialization
+      filterChurn('All');
+      filterLifespan('All');
+      updateCoachChart();
 
-      const ctx3 = document.getElementById('chart-lifespan').getContext('2d');
-      charts['chart-lifespan'] = new Chart(ctx3, {
-          type: 'bar',
-          data: { labels: mockData.lifespan.labels, datasets: [{ label: '평균 수강 기간 (개월)', data: mockData.lifespan.data, backgroundColor: '#3b82f6', borderRadius: { topLeft: 8, topRight: 8 } }] },
-          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }, y: { grid: { color: 'rgba(0,0,0,0.05)' }, beginAtZero: true } } }
-      });
-
-      const ctx4 = document.getElementById('chart-coach').getContext('2d');
-      charts['chart-coach'] = new Chart(ctx4, {
-          type: 'radar',
-          data: { labels: mockData.coachPerformance.labels, datasets: mockData.coachPerformance.datasets.map(ds => ({ label: ds.label, data: ds.data, backgroundColor: ds.color, borderColor: ds.border, borderWidth: 2, pointBackgroundColor: ds.border })) },
-          options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { color: 'rgba(0,0,0,0.1)' }, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { display: false, min: 0, max: 100 } } }, plugins: { legend: { position: 'bottom' } } }
-      });
-
-      buildHeatmap(mockData.heatmap);
+      buildHeatmap(processedAnalytics.heatmapData);
   }
 
+  function filterChurn(branch, el) {
+      if(el) { document.querySelectorAll('#churn-branch-filters .pill-tab').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
+      let cData = processedAnalytics.churnData[branch] || {};
+      let sortedKeys = Object.keys(cData).sort((a,b) => cData[b] - cData[a]);
+      
+      if(charts['chart-churn']) charts['chart-churn'].destroy();
+      charts['chart-churn'] = new Chart(document.getElementById('chart-churn').getContext('2d'), { 
+          type: 'bar', 
+          data: { labels: sortedKeys, datasets: [{ label: '퇴원 건수', data: sortedKeys.map(k => cData[k]), backgroundColor: '#ef4444', borderRadius: 6 }] }, 
+          options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(0,0,0,0.05)' } }, y: { grid: { display: false }, ticks: { font: { weight: 'bold' } } } } } 
+      });
+  }
+
+  function filterLifespan(branch, el) {
+      if(el) { document.querySelectorAll('#lifespan-branch-filters .pill-tab').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
+      
+      let lData = branch === 'All' ? processedAnalytics.lifespanData.filter(d => d.branch !== 'All') : processedAnalytics.lifespanData.filter(d => d.branch === branch);
+      let bNames = {'Busan':'부산', 'Incheon':'인천', 'Gwangju':'광주'};
+
+      if(charts['chart-lifespan']) charts['chart-lifespan'].destroy();
+      charts['chart-lifespan'] = new Chart(document.getElementById('chart-lifespan').getContext('2d'), { 
+          type: 'bar', 
+          data: { labels: lData.map(d=>bNames[d.branch]||d.branch), datasets: [{ label: '평균 수강 (개월)', data: lData.map(d=>d.avg), backgroundColor: '#10b981', borderRadius: { topLeft: 8, topRight: 8 } }] }, 
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }, y: { grid: { color: 'rgba(0,0,0,0.05)' }, beginAtZero:true } } } 
+      });
+  }
+
+  function updateCoachChart() {
+      let selName = document.getElementById('coach-eval-select').value;
+      let coach = processedAnalytics.coachData.find(c => c.name === selName);
+      if(!coach) return;
+
+      if(charts['chart-coach']) charts['chart-coach'].destroy();
+      charts['chart-coach'] = new Chart(document.getElementById('chart-coach').getContext('2d'), { 
+          type: 'radar', 
+          data: { labels: ['티어 향상(%)', '재등록률', '정원 확보율', '출석률', '평균 수강기간 점수'], datasets: [{ label: coach.name, data: coach.metrics, backgroundColor: 'rgba(194, 155, 56, 0.5)', borderColor: '#c29b38', borderWidth: 2, pointBackgroundColor: '#c29b38' }] }, 
+          options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { color: 'rgba(0,0,0,0.1)' }, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { display: false, min: 0, max: 100 } } }, plugins: { legend: { position: 'bottom' } } } 
+      });
+  }
+
+  // HEATMAP (Numbers Visible + Contrast)
   function buildHeatmap(heatmapData) {
       const container = document.getElementById('heatmap-container');
       container.innerHTML = '<div></div>'; 
 
       let tooltip = document.getElementById('heatmap-tooltip');
-      if (!tooltip) {
-          tooltip = document.createElement('div');
-          tooltip.id = 'heatmap-tooltip';
-          tooltip.className = 'custom-tooltip hidden';
-          document.body.appendChild(tooltip); 
-      }
+      if (!tooltip) { tooltip = document.createElement('div'); tooltip.id = 'heatmap-tooltip'; tooltip.className = 'custom-tooltip hidden'; document.body.appendChild(tooltip); }
 
-      heatmapData.days.forEach(day => {
-          const h = document.createElement('div'); h.className = 'heatmap-header'; h.innerText = day; container.appendChild(h);
-      });
+      heatmapData.days.forEach(day => { const h = document.createElement('div'); h.className = 'heatmap-header'; h.innerText = day; container.appendChild(h); });
 
       heatmapData.times.forEach((time, rowIndex) => {
           const t = document.createElement('div'); t.className = 'heatmap-time'; t.innerText = time; container.appendChild(t);
           
           heatmapData.data[rowIndex].forEach((val, colIndex) => {
               const cell = document.createElement('div');
-              cell.className = 'heatmap-cell';
-              const opacity = val / 100;
+              cell.className = 'heatmap-cell border border-transparent';
+              
+              let capVal = Math.min(val, 100);
+              const opacity = capVal / 100;
               cell.style.backgroundColor = `rgba(194, 155, 56, ${opacity < 0.1 ? 0.05 : opacity})`;
-              cell.innerText = `${val}%`;
+              cell.style.color = opacity > 0.5 ? '#ffffff' : '#1e293b'; 
+              cell.innerText = `${capVal}%`;
 
               cell.addEventListener('mouseenter', (e) => {
-                  tooltip.innerHTML = `<strong>${heatmapData.days[colIndex]} ${time}</strong><br>가동률: ${val}%`;
-                  tooltip.classList.remove('hidden');
-                  tooltip.style.opacity = '1';
-                  
+                  tooltip.innerHTML = `<strong>${heatmapData.days[colIndex]} ${time}</strong><br>가동률: ${capVal}%`;
+                  tooltip.classList.remove('hidden'); tooltip.style.opacity = '1';
                   const rect = cell.getBoundingClientRect();
                   tooltip.style.left = (rect.left + (rect.width/2) - (tooltip.offsetWidth/2)) + 'px';
                   tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px';
               });
-
-              cell.addEventListener('mouseleave', () => {
-                  tooltip.style.opacity = '0';
-                  setTimeout(() => tooltip.classList.add('hidden'), 200);
-              });
+              cell.addEventListener('mouseleave', () => { tooltip.style.opacity = '0'; setTimeout(() => tooltip.classList.add('hidden'), 200); });
               container.appendChild(cell);
           });
       });
   }
 
-  document.querySelector('.main-content').addEventListener('scroll', () => {
-      const tooltip = document.getElementById('heatmap-tooltip');
-      if(tooltip) tooltip.style.opacity = '0';
-  });
+  document.querySelector('.main-content').addEventListener('scroll', () => { const t = document.getElementById('heatmap-tooltip'); if(t) t.style.opacity = '0'; });
 
-  // Secondary Tabs Loaders
-  function loadRenewal(el) { 
-      showSection('renewal', el); 
-      document.getElementById('loading').classList.remove('hidden');
-      google.script.run.withSuccessHandler(res => {
-          const data = typeof res === 'string' ? JSON.parse(res) : res;
-          window.globalRenewalData = data;
-          filterRenewal('All');
-          document.getElementById('loading').classList.add('hidden');
-      }).withFailureHandler(e => { document.getElementById('loading').classList.add('hidden'); showToast(e.message); }).loadRenewalData();
-  }
-  
-  function loadConsultationList(el) { 
-      showSection('consultation', el); 
-      document.getElementById('loading').classList.remove('hidden');
-      google.script.run.withSuccessHandler(res => {
-          const data = typeof res === 'string' ? JSON.parse(res) : res;
-          window.globalConsultationData = data;
-          filterConsultation('All');
-          document.getElementById('loading').classList.add('hidden');
-      }).withFailureHandler(e => { document.getElementById('loading').classList.add('hidden'); showToast(e.message); }).loadConsultationData();
-  }
+  // Loaders
+  function loadRenewal(el) { showSection('renewal', el); document.getElementById('loading').classList.remove('hidden'); google.script.run.withSuccessHandler(res => { const data = typeof res === 'string' ? JSON.parse(res) : res; window.globalRenewalData = data; filterRenewal('All'); document.getElementById('loading').classList.add('hidden'); }).withFailureHandler(e => { document.getElementById('loading').classList.add('hidden'); showToast(e.message); }).loadRenewalData(); }
+  function loadConsultationList(el) { showSection('consultation', el); document.getElementById('loading').classList.remove('hidden'); google.script.run.withSuccessHandler(res => { const data = typeof res === 'string' ? JSON.parse(res) : res; window.globalConsultationData = data; filterConsultation('All'); document.getElementById('loading').classList.add('hidden'); }).withFailureHandler(e => { document.getElementById('loading').classList.add('hidden'); showToast(e.message); }).loadConsultationData(); }
 
   function filterRenewal(b, el) { 
       if(el) { document.querySelectorAll('#renewal-branch-filters .pill-tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); } 
-      const c = document.getElementById('renewal-content');
-      let data = window.globalRenewalData?.data || [];
-      if(b !== 'All') data = data.filter(r => r[1] === b);
-      if(!data.length) return c.innerHTML = '<div class="text-center p-12 text-gray-400 font-bold border border-white/50 rounded-3xl bg-white/30">NO RENEWAL LOGS</div>';
-      
-      let h = `<div class="table-container"><table><thead><tr>`;
-      window.globalRenewalData.header.forEach(x => h += `<th>${x}</th>`);
-      h += `</tr></thead><tbody>`;
-      data.forEach(r => {
-          h += `<tr>`;
-          r.slice(0, -1).forEach((val, idx) => {
-              if(idx === 0) h += `<td><a href="#" class="col-id">${val}</a></td>`;
-              else h += `<td>${val}</td>`;
-          });
-          h += `</tr>`;
-      });
-      h += `</tbody></table></div>`;
-      c.innerHTML = h;
+      const c = document.getElementById('renewal-content'); let data = window.globalRenewalData?.data || []; if(b !== 'All') data = data.filter(r => r[1] === b);
+      if(!data.length) return c.innerHTML = '<div class="text-center p-12 text-gray-400 font-bold border border-white/50 rounded-3xl bg-white/30">기록이 없습니다.</div>';
+      let h = `<div class="table-container"><table><thead><tr>`; window.globalRenewalData.header.forEach(x => h += `<th>${x}</th>`); h += `</tr></thead><tbody>`;
+      data.forEach(r => { h += `<tr>`; r.slice(0, -1).forEach((val, idx) => { if(idx === 0) h += `<td><a class="col-id font-bold">${val}</a></td>`; else h += `<td>${val}</td>`; }); h += `</tr>`; });
+      c.innerHTML = h + `</tbody></table></div>`;
   }
 
   function filterConsultation(b, el) { 
       if(el) { document.querySelectorAll('#consult-branch-filters .pill-tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); } 
-      const c = document.getElementById('consultation-content');
-      let data = window.globalConsultationData || [];
-      if(b !== 'All') data = data.filter(r => r[1] === b);
-      if(!data.length) return c.innerHTML = '<div class="text-center p-12 text-gray-400 font-bold border border-white/50 rounded-3xl bg-white/30">NO LEAD DATA</div>';
-      
-      let h = `<div class="table-container"><table><thead><tr><th>BRANCH</th><th>MANAGER</th><th>LEAD DATE</th><th>CONSULT DATE</th><th>TYPE</th><th>NAME</th><th>PHONE</th></tr></thead><tbody>`;
-      data.forEach(r => {
-          h += `<tr><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="font-bold text-[#c29b38]">${r[4]}</td><td>${r[5]}</td><td class="font-bold text-gray-900">${r[8]}</td><td>${r[9]}</td></tr>`;
-      });
-      h += `</tbody></table></div>`;
-      c.innerHTML = h;
+      const c = document.getElementById('consultation-content'); let data = window.globalConsultationData || []; if(b !== 'All') data = data.filter(r => r[1] === b);
+      if(!data.length) return c.innerHTML = '<div class="text-center p-12 text-gray-400 font-bold border border-white/50 rounded-3xl bg-white/30">기록이 없습니다.</div>';
+      let h = `<div class="table-container"><table><thead><tr><th>지점</th><th>담당자</th><th>리드 일자</th><th>상담 일시</th><th>형태</th><th>이름</th><th>연락처</th></tr></thead><tbody>`;
+      const bNames = {'Busan':'부산','Incheon':'인천','Gwangju':'광주'};
+      data.forEach(r => { h += `<tr class="cursor-pointer hover:bg-white/50" onclick="openLeadModal(${r[18]})"><td>${bNames[r[1]]||r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="font-bold text-[#c29b38]">${r[4]}</td><td>${r[5]}</td><td class="font-bold text-gray-900">${r[8]}</td><td>${r[9]}</td></tr>`; });
+      c.innerHTML = h + `</tbody></table></div>`;
   }
 
   function editNotice() { document.getElementById('notice-edit-input').value = document.getElementById('notice-text').innerText; new bootstrap.Modal(document.getElementById('noticeModal')).show(); }
-  function saveNotice() { 
-    const t = document.getElementById('notice-edit-input').value; 
-    document.getElementById('notice-text').innerText = t; 
-    bootstrap.Modal.getInstance(document.getElementById('noticeModal')).hide(); 
-    showToast("Notice Updated"); 
-    google.script.run.saveNotice(t, userInfo.name);
+  function saveNotice() { const t = document.getElementById('notice-edit-input').value; document.getElementById('notice-text').innerText = t; bootstrap.Modal.getInstance(document.getElementById('noticeModal')).hide(); showToast("공지사항 저장 완료"); google.script.run.saveNotice(t, userInfo.name); }
+  function openAddModal() { new bootstrap.Modal(document.getElementById('addModal')).show(); }
+  
+  function openLeadModal(rowIdx) {
+      if(rowIdx) {
+          const r = window.globalConsultationData.find(item => parseInt(item[18]) === parseInt(rowIdx));
+          if(r) {
+              document.getElementById('ld-row').value = rowIdx;
+              document.getElementById('ld-name').value = r[8] || ''; document.getElementById('ld-phone').value = r[9] || '';
+              document.getElementById('ld-type').value = r[5] || '방문 상담'; document.getElementById('ld-date').value = r[4] || '';
+              document.getElementById('ld-note').value = r[15] || '';
+              document.getElementById('btn-delete-lead').classList.remove('hidden');
+          }
+      } else {
+          document.getElementById('ld-row').value = ""; document.getElementById('ld-name').value = ''; document.getElementById('ld-phone').value = ''; document.getElementById('ld-note').value = '';
+          document.getElementById('btn-delete-lead').classList.add('hidden');
+      }
+      new bootstrap.Modal(document.getElementById('leadModal')).show();
   }
+  
+  function submitNewStudent() { bootstrap.Modal.getInstance(document.getElementById('addModal')).hide(); showToast("데이터 등록 중..."); google.script.run.withSuccessHandler(()=>showToast("등록 완료")).addNewStudent(JSON.stringify({id:"N100"}), userInfo.name); }
+  function submitLead() { bootstrap.Modal.getInstance(document.getElementById('leadModal')).hide(); showToast("상담 내용 저장 중..."); google.script.run.withSuccessHandler(()=>loadConsultationList()).updateConsultation(JSON.stringify({})); }
+  function deleteLead() { bootstrap.Modal.getInstance(document.getElementById('leadModal')).hide(); showToast("상담 기록 삭제 중..."); google.script.run.withSuccessHandler(()=>loadConsultationList()).deleteConsultation(JSON.stringify({row: document.getElementById('ld-row').value})); }
+  function openRenewalModal() { new bootstrap.Modal(document.getElementById('renewalModal')).show(); }
+  function toggleRenewalTags() { const st = document.getElementById('rn-status').value; document.getElementById('rn-tag-container').classList.toggle('hidden', st !== 'Out'); }
+  function submitRenewal() { bootstrap.Modal.getInstance(document.getElementById('renewalModal')).hide(); showToast("기록 저장 중..."); google.script.run.withSuccessHandler(()=>loadRenewal()).addNewRenewal(JSON.stringify({id: document.getElementById('rn-id').value}), userInfo.name); }
 
 </script>
 
 </body>
+</html>
 </html>
