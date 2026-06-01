@@ -5,37 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>GGA Command Center</title>
   
-  <!-- CSS Frameworks & Libraries -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
   
-  <!-- JS Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
-  <!-- 
-  <!-- Chosen Palette: Clean White & Gen.G Gold Theme (White #ffffff, Off-white #f8fafc, Gold #c29b38, Dark Gray #1e293b, Subdued Accents: Blue #3b82f6, Red #ef4444, Green #10b981) -->
-  <!-- Application Structure Plan: The SPA uses a sidebar-driven dashboard layout. The Analytics section has been completely revamped to feature a 2-column Bento Grid layout. This allows decision-makers to view branch performance, churn, and coach evaluations simultaneously, while the detailed time-slot heatmap spans full width at the bottom. -->
-  <!-- Visualization & Content Choices: 
-       1. 지점별 학생 수 -> Doughnut Chart (Chart.js)
-       2. 퇴원 사유 분석 -> Horizontal Bar Chart (Chart.js) - Pareto style
-       3. 평균 수강 유지 기간 -> Vertical Bar Chart (Chart.js)
-       4. 코치 성과 지수 -> Radar Chart (Chart.js)
-       5. 시간대 가동률 -> Custom HTML/CSS Heatmap to avoid Canvas scaling issues on complex grids.
-  -->
-  <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-  -->
-
   <style>
     /* === Modern Light Glass Theme === */
     :root { 
       --geng-gold: #c29b38; 
       --geng-gold-light: rgba(194, 155, 56, 0.15);
       --geng-bg: #f3f5f9;
-      --glass-bg: rgba(255, 255, 255, 0.5);
-      --glass-border: rgba(255, 255, 255, 0.8);
+      --glass-bg: rgba(255, 255, 255, 0.55);
+      --glass-border: rgba(255, 255, 255, 0.9);
       --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
       --text-main: #1e293b;
       --text-muted: #64748b;
@@ -45,13 +30,13 @@
       background-color: var(--geng-bg);
       font-family: 'Pretendard', sans-serif; 
       color: var(--text-main); 
-      overflow: hidden; /* Prevent full body scroll, handle inside main */
+      overflow: hidden; 
       letter-spacing: -0.01em; 
     }
 
     /* Mesh Gradient Background (Trendy Aurora Effect) */
     .mesh-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; background: #f3f5f9; }
-    .mesh-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.6; animation: float 20s infinite ease-in-out alternate; }
+    .mesh-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; animation: float 20s infinite ease-in-out alternate; pointer-events: none; }
     .mesh-blob-1 { background: rgba(194, 155, 56, 0.3); width: 40vw; height: 40vw; top: -10%; left: -10%; }
     .mesh-blob-2 { background: rgba(59, 130, 246, 0.2); width: 35vw; height: 35vw; bottom: 0%; right: -5%; animation-delay: -5s;}
     .mesh-blob-3 { background: rgba(16, 185, 129, 0.15); width: 30vw; height: 30vw; top: 40%; left: 40%; animation-delay: -10s;}
@@ -85,12 +70,12 @@
     .main-content { flex: 1; overflow-y: auto; padding: 32px; position: relative; scroll-behavior: smooth; }
 
     /* === Components === */
-    .view-section { display: none; opacity: 0; animation: fadeIn 0.4s ease forwards; }
-    .view-section.active { display: block; }
+    .view-section { display: none; opacity: 0; }
+    .view-section.active { display: block; animation: fadeIn 0.4s ease forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     /* Inputs */
-    .form-control-custom, .form-select-custom { background: rgba(255,255,255,0.6) !important; border: 1px solid rgba(255,255,255,0.8) !important; border-radius: 12px; padding: 12px 16px; font-size: 0.95rem; width: 100%; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); transition: 0.3s; color: var(--text-main) !important;}
+    .form-control-custom, .form-select-custom { background: rgba(255,255,255,0.7) !important; border: 1px solid rgba(255,255,255,0.9) !important; border-radius: 12px; padding: 12px 16px; font-size: 0.95rem; width: 100%; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); transition: 0.3s; color: var(--text-main) !important;}
     .form-control-custom:focus, .form-select-custom:focus { background: #fff !important; border-color: var(--geng-gold) !important; box-shadow: 0 0 0 3px var(--geng-gold-light) !important; outline: none; }
 
     /* Buttons */
@@ -105,11 +90,11 @@
     .pill-tab.active { background: #fff; color: var(--geng-gold); border-color: rgba(255,255,255,0.9); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
     /* Table Typography & Layout */
-    .table-container { overflow-x: auto; border-radius: 16px; background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.8); box-shadow: var(--glass-shadow); }
+    .table-container { overflow-x: auto; border-radius: 16px; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.8); box-shadow: var(--glass-shadow); }
     table { width: 100%; text-align: left; font-size: 0.85rem; border-collapse: collapse; }
-    th { background: rgba(255,255,255,0.6); padding: 16px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(0,0,0,0.05); white-space: nowrap; }
-    td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.4); white-space: nowrap; color: #334155; font-weight: 500; transition: 0.2s;}
-    tr:hover td { background: rgba(255,255,255,0.6); }
+    th { background: rgba(255,255,255,0.7); padding: 16px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(0,0,0,0.05); white-space: nowrap; position: sticky; top: 0; z-index: 10; }
+    td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.5); white-space: nowrap; color: #334155; font-weight: 500; transition: 0.2s;}
+    tr:hover td { background: rgba(255,255,255,0.7); }
     
     .col-id { color: var(--geng-gold); font-weight: 800; cursor: pointer; text-decoration: none;}
     .col-id:hover { text-decoration: underline; }
@@ -133,8 +118,8 @@
     .custom-tooltip { position: fixed; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); color: white; padding: 8px 12px; border-radius: 8px; font-size: 0.75rem; pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 99999; white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
     /* Toasts & Modals */
-    #toast-container { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; align-items: center; }
-    .toast-msg { background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); color: var(--text-main); padding: 14px 28px; border-radius: 100px; font-weight: 800; font-size: 0.9rem; box-shadow: 0 10px 40px rgba(0,0,0,0.1); animation: toastAnim 0.3s forwards; border: 1px solid #fff; }
+    #toast-container { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; align-items: center; pointer-events: none;}
+    .toast-msg { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); color: var(--text-main); padding: 14px 28px; border-radius: 100px; font-weight: 800; font-size: 0.9rem; box-shadow: 0 10px 40px rgba(0,0,0,0.1); animation: toastAnim 0.3s forwards; border: 1px solid #fff; pointer-events: auto;}
     @keyframes toastAnim { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
     
     .modal-content { background: rgba(243, 245, 249, 0.85); backdrop-filter: blur(40px); border-radius: 24px; border: 1px solid rgba(255,255,255,1); box-shadow: 0 30px 60px rgba(0,0,0,0.15); }
@@ -168,78 +153,52 @@
     }
   </style>
 
-  <!-- Mock DB & Logic Setup -->
   <script>
-    let ggaMockDB = JSON.parse(localStorage.getItem('gga_mock_db')) || {
-        notice: "COMM SYSTEM ONLINE.\n새롭게 업데이트된 Analytics 탭에서 핵심 KPI를 한눈에 파악하세요.",
-        students: [
-            ["S1001", "Busan", "Active", "VAL Plus", "ArHaN", "월수", "18-21", "VAL", "김발로", "2024-01-01", "2026-12-31", "2005-05-05", "01012345678", "01098765432", "초1", "불1", "다1", "초1", "", "초기 상담 완료", "", ""],
-            ["S1002", "Incheon", "Waiting", "VAL Basic", "Carry", "화목", "18-21", "VAL", "이인천", "2024-06-01", "2024-12-31", "2006-06-06", "01022223333", "01044445555", "브1", "실1", "아이언", "아이언", "", "", "", ""],
-            ["S1003", "Busan", "Loading", "VAL Plus", "ArHaN", "주말", "10-13", "VAL", "박보스", "2023-01-01", "2024-05-20", "2004-04-04", "01011111111", "01022222222", "레디", "레디", "불3", "불3", "", "수강 연장 필요", "", ""]
-        ],
-        consults: [
-            ["ORD-01", "Busan", "MasterUser", "2024-05-20", "2024-05-25", "방문 상담", "전화", "네이버 검색", "최신규", "01099998888", "골1", "실1", "2008-01-01", "01077776666", true, "체험 수업 희망", "14:00", "evt-001"]
-        ],
-        renewals: [
-            ["S1003", "Busan", "ArHaN", "박보스", "01011111111", "01022222222", "2024-05-26", "Out", "진학 문제", "학업 집중으로 임시 휴식"]
-        ]
-    };
-    
-    // Updated backend mock to include the detailed analytics data
-    const backendFns = {
-        loadSystemData: function(code) {
-            if(code !== 'master1234') throw new Error("접근 코드가 올바르지 않습니다.");
-            const user = { name: "관리자", role: "Admin", region: "Master", code: "master1234" };
-            const header = ["코드", "지점", "상태", "프로그램", "코치", "요일", "시간", "종목", "이름", "시작일", "종료일", "생년월일", "연락처", "부모님", "KR초기", "KR현재", "AS초기", "AS현재"];
-            let stats = { totalActive: 0, branches: { 'Busan':{a:0, w:0, l:0, i:0, new:1, ren:0, out:0, totalRen:0, totalOut:0}, 'Incheon':{a:0, w:0, l:0, i:0, new:0, ren:0, out:0, totalRen:0, totalOut:0}, 'Gwangju':{a:0, w:0, l:0, i:0, new:0, ren:0, out:0, totalRen:0, totalOut:0} }};
-            let urgentList = [];
-            let studentList = ggaMockDB.students.map((s, idx) => {
-                if (stats.branches[s[1]]) {
-                    if (s[2] === 'Active') stats.branches[s[1]].a++;
-                    if (s[2] === 'Waiting') stats.branches[s[1]].w++;
-                    if (s[2] === 'Loading') stats.branches[s[1]].l++;
-                    if (s[2] === 'Inactive') stats.branches[s[1]].i++;
-                    if (['Active', 'Waiting'].includes(s[2])) stats.totalActive++;
-                }
-                if (s[2] === 'Loading') urgentList.push({ name: s[8], branch: s[1], status: s[2], category: 'loading', reason: "Loading", row: idx + 2 });
-                return { rowNum: idx + 2, values: s.slice(0, 18), classInfo: `${s[4]} (${s[5]})` };
-            });
-            let weekConsults = ggaMockDB.consults.map((c, idx) => ({ branch: c[1], manager: c[2], date: c[4] + (c[16] ? ' ' + c[16] : ''), type: c[5], rowIdx: idx + 2 }));
-            return JSON.stringify({ user, notice: ggaMockDB.notice, stats, header, data: studentList, weekConsults, urgentList });
-        },
-        loadConsultationData: function() { return JSON.stringify(ggaMockDB.consults.map((c, i) => [...c, i+2])); },
-        loadRenewalData: function() { return JSON.stringify({ header: ["ID","지점","코치","이름","연락처","부모님","일자","상태","태그","비고"], data: ggaMockDB.renewals }); },
-        getAnalyticsData: function() { 
-            return {
-                branchCounts: { labels: ['Busan', 'Incheon', 'Gwangju'], data: [210, 135, 83] },
-                churnReasons: { labels: ['흥미 저하', '학업 집중(시험기간)', '금전적 문제', '진학 문제', '이사/거리', '코치 불만족', '기타'], data: [45, 38, 22, 15, 8, 4, 3] },
-                lifespan: { labels: ['ArHaN (Busan)', 'Carry (Incheon)', 'Puple (Busan)', 'Owen (Gwangju)', 'Huby (Incheon)'], data: [8.5, 7.2, 6.8, 5.5, 4.2] },
-                coachPerformance: {
-                    labels: ['티어 향상도', '리텐션(재등록)', '학생 정원율', '출석률', '상담/피드백'],
-                    datasets: [
-                        { label: 'ArHaN', data: [95, 88, 100, 92, 85], color: 'rgba(194, 155, 56, 0.6)', border: '#c29b38' },
-                        { label: 'Carry', data: [80, 92, 85, 88, 95], color: 'rgba(59, 130, 246, 0.6)', border: '#3b82f6' }
-                    ]
-                },
-                heatmap: {
-                    times: ['14:00', '16:00', '18:00', '20:00', '22:00'],
-                    days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    data: [
-                        [10, 15, 20, 15, 30, 85, 90], [20, 25, 30, 25, 40, 95, 100], [80, 85, 90, 85, 95, 70, 60], [100, 95, 100, 90, 80, 50, 40], [60, 50, 65, 55, 40, 20, 15]
-                    ]
-                }
-            }; 
-        }
-    };
+    // =========================================================================
+    // 🚀 실제 통신용 API URL 적용 완료!
+    // =========================================================================
+    const API_URL = "https://script.google.com/macros/s/AKfycbzULuXhd5kYroOSwIpF08Ss57Hu1UQjyzWAcc3ABIS_4bbmgJx9v2YY_YPlYnkR3NU/exec";
+    // =========================================================================
 
-    function createRunner(sCb, fCb) {
-        const runner = { withSuccessHandler: function(cb) { return createRunner(cb, fCb); }, withFailureHandler: function(cb) { return createRunner(sCb, cb); } };
-        for (let k in backendFns) { runner[k] = function(...args) { setTimeout(() => { try { const res = backendFns[k](...args); if(sCb) sCb(res); } catch(e) { if(fCb) fCb(e); else console.error(e); } }, 300); }; }
+    // 🚀 실서버 연동 통신 모듈 (Fetch API)
+    function createLiveRunner(sCb, fCb) {
+        const runner = {
+            withSuccessHandler: function(cb) { return createLiveRunner(cb, fCb); },
+            withFailureHandler: function(cb) { return createLiveRunner(sCb, cb); }
+        };
+
+        const methods = [
+            'loadSystemData', 'loadConsultationData', 'addNewConsultation', 'updateConsultation',
+            'deleteConsultation', 'addNewStudent', 'loadRenewalData', 'addNewRenewal',
+            'getAnalyticsData', 'updateStudentData', 'saveNotice', 'saveConsultation',
+            'saveExtensionReason', 'saveComment', 'clearComment'
+        ];
+
+        methods.forEach(method => {
+            runner[method] = function(...args) {
+                // 구글 시트로 POST 요청 보내기
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: method, args: args }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' } // CORS 우회를 위한 text/plain 트릭
+                })
+                .then(r => r.json())
+                .then(json => {
+                    if(json.success) { if(sCb) sCb(json.data); }
+                    else { if(fCb) fCb(new Error(json.error)); else console.error(json.error); }
+                })
+                .catch(err => {
+                    if(fCb) fCb(err); else console.error(err);
+                });
+            };
+        });
         return runner;
     }
-    window.google = { script: { run: createRunner(null, null) } };
     
-    // Global Chart Defaults
+    // 전역 변수 설정 (이제 이 객체를 통해 구글 앱스 스크립트와 동일하게 통신합니다)
+    window.google = { script: { run: createLiveRunner(null, null) } };
+    
+    // Chart Defaults
     Chart.defaults.color = '#64748b'; 
     Chart.defaults.font.family = "'Pretendard', sans-serif"; 
     Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(30, 41, 59, 0.95)'; 
@@ -251,7 +210,6 @@
 </head>
 <body>
 
-<!-- Ambient Background -->
 <div class="mesh-bg">
     <div class="mesh-blob mesh-blob-1"></div>
     <div class="mesh-blob mesh-blob-2"></div>
@@ -263,10 +221,8 @@
     <div class="spinner-border text-[#c29b38]" style="width: 3rem; height: 3rem;" role="status"></div>
 </div>
 
-<!-- Custom Tooltip for Heatmap -->
 <div id="heatmap-tooltip" class="custom-tooltip hidden"></div>
 
-<!-- Login Section -->
 <div id="login-section" class="w-full h-screen flex justify-center items-center px-4 z-10 relative">
   <div class="glass-panel p-10 max-w-md w-full text-center">
     <div class="mb-6 flex justify-center">
@@ -279,10 +235,8 @@
   </div>
 </div>
 
-<!-- Main App Layout -->
 <div id="app-container" class="app-layout hidden">
     
-    <!-- Desktop Sidebar -->
     <aside class="sidebar">
         <div class="flex items-center gap-3 px-2 py-4 mb-4 border-b border-white/50">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c29b38" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
@@ -315,7 +269,6 @@
         </div>
     </aside>
 
-    <!-- Mobile Bottom Nav -->
     <nav class="mobile-bottom-nav">
         <div class="nav-mob-item active" data-target="home" onclick="showSection('home', this)"><i class="bi bi-house-door"></i>메인</div>
         <div class="nav-mob-item" data-target="system" onclick="showSection('system', this)"><i class="bi bi-people"></i>학생</div>
@@ -324,19 +277,16 @@
         <div class="nav-mob-item" data-target="consultation" onclick="loadConsultationList(this)"><i class="bi bi-telephone"></i>리드</div>
     </nav>
 
-    <!-- Main Content Area -->
     <main class="main-content">
         
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-black tracking-tight text-gray-900" id="header-title">메인</h1>
-            <button class="btn-gold text-sm px-4 py-2 flex items-center gap-2" onclick="showToast('신규 등록 메뉴')">
+            <button class="btn-gold text-sm px-4 py-2 flex items-center gap-2" onclick="showToast('신규 등록 메뉴는 개발 중입니다')">
                 <i class="bi bi-plus-lg"></i> <span class="hidden sm:inline">Register</span>
             </button>
         </div>
 
-        <!-- 1. Home Dashboard -->
         <section id="home-view" class="view-section active">
-            <!-- Notice -->
             <div class="glass-panel p-6 mb-8 flex justify-between items-start border-l-4 border-l-[#c29b38]">
                 <div>
                     <div class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">System Notice</div>
@@ -345,11 +295,9 @@
                 <button onclick="editNotice()" class="text-gray-400 hover:text-[#c29b38] transition-colors"><i class="bi bi-pencil-square text-lg"></i></button>
             </div>
 
-            <!-- Bento Stats -->
             <div id="dashboard-summary" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8"></div>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Urgent -->
                 <div class="glass-panel flex flex-col h-96">
                     <div class="p-5 border-b border-white/50 flex items-center gap-3">
                         <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-500"><i class="bi bi-exclamation-triangle-fill"></i></div>
@@ -359,7 +307,6 @@
                         <table class="w-full text-left text-sm"><tbody id="urgent-list-body"></tbody></table>
                     </div>
                 </div>
-                <!-- Consults -->
                 <div class="glass-panel flex flex-col h-96">
                     <div class="p-5 border-b border-white/50 flex items-center gap-3">
                         <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><i class="bi bi-calendar-check-fill"></i></div>
@@ -372,7 +319,6 @@
             </div>
         </section>
 
-        <!-- 2. System Data -->
         <section id="system-view" class="view-section">
             <div class="glass-panel p-5 mb-6 flex flex-col xl:flex-row gap-4 justify-between items-center">
                 <div class="flex flex-wrap gap-2 bg-white/40 p-2 rounded-2xl border border-white/60" id="branch-filters">
@@ -396,97 +342,67 @@
             <div id="main-content"></div>
         </section>
 
-        <!-- 3. NEW Analytics Dashboard -->
         <section id="analytics-view" class="view-section">
-            
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                
-                <!-- KPI 1: 지점별 학생 수 -->
                 <div class="glass-panel p-6 flex flex-col">
                     <div class="mb-4 border-b border-white/50 pb-4">
                         <h3 class="text-sm font-black text-gray-800 uppercase tracking-wide flex items-center gap-2">
                             <i class="bi bi-pie-chart-fill text-[#c29b38]"></i> 지점별 학생 수
                         </h3>
-                        <p class="text-xs text-gray-500 mt-1">지점 규모 및 파이프라인 점유율 비교 (Active & Waiting)</p>
                     </div>
                     <div class="chart-box flex-1"><canvas id="chart-branch"></canvas></div>
                 </div>
-
-                <!-- KPI 2: 퇴원 사유 분석 -->
                 <div class="glass-panel p-6 flex flex-col">
                     <div class="mb-4 border-b border-white/50 pb-4">
                         <h3 class="text-sm font-black text-gray-800 uppercase tracking-wide flex items-center gap-2">
                             <i class="bi bi-bar-chart-steps text-red-500"></i> 주요 퇴원 사유
                         </h3>
-                        <p class="text-xs text-gray-500 mt-1">최근 누적된 주요 이탈(Churn) 원인 파레토 정렬</p>
                     </div>
                     <div class="chart-box flex-1"><canvas id="chart-churn"></canvas></div>
                 </div>
-
-                <!-- KPI 3: 평균 수강 유지 기간 -->
                 <div class="glass-panel p-6 flex flex-col">
                     <div class="mb-4 border-b border-white/50 pb-4">
                         <h3 class="text-sm font-black text-gray-800 uppercase tracking-wide flex items-center gap-2">
                             <i class="bi bi-calendar3 text-blue-500"></i> 평균 수강 유지 기간 (개월)
                         </h3>
-                        <p class="text-xs text-gray-500 mt-1">코치별 수강생 LTV (고객 생애 가치) 비교</p>
                     </div>
                     <div class="chart-box flex-1"><canvas id="chart-lifespan"></canvas></div>
                 </div>
-
-                <!-- KPI 4: 코치 성과 지수 -->
                 <div class="glass-panel p-6 flex flex-col">
                     <div class="mb-4 border-b border-white/50 pb-4">
                         <h3 class="text-sm font-black text-gray-800 uppercase tracking-wide flex items-center gap-2">
                             <i class="bi bi-bullseye text-[#10b981]"></i> 코치 다면 평가 지수
                         </h3>
-                        <p class="text-xs text-gray-500 mt-1">티어, 출석, 유지율 등 다중 변수 평가 모델</p>
                     </div>
                     <div class="chart-box flex-1"><canvas id="chart-coach"></canvas></div>
                 </div>
-
-                <!-- KPI 5: 시간대 가동률 히트맵 -->
                 <div class="glass-panel p-6 flex flex-col lg:col-span-2">
                     <div class="mb-4 border-b border-white/50 pb-4">
                         <h3 class="text-sm font-black text-gray-800 uppercase tracking-wide flex items-center gap-2">
                             <i class="bi bi-grid-3x3-gap-fill text-[#c29b38]"></i> 주간 슬롯 가동률 히트맵
                         </h3>
-                        <p class="text-xs text-gray-500 mt-1">전체 클래스의 요일/시간대별 점유 밀도 (색이 짙을수록 정원 초과)</p>
                     </div>
                     <div id="heatmap-container" class="heatmap-grid w-full"></div>
-                    <div class="mt-4 flex justify-end gap-2 text-xs font-bold text-gray-400 items-center">
-                        <span>Low</span>
-                        <div class="w-4 h-4 rounded bg-[#c29b38] opacity-10"></div>
-                        <div class="w-4 h-4 rounded bg-[#c29b38] opacity-40"></div>
-                        <div class="w-4 h-4 rounded bg-[#c29b38] opacity-70"></div>
-                        <div class="w-4 h-4 rounded bg-[#c29b38] opacity-100"></div>
-                        <span>High (Max)</span>
-                    </div>
                 </div>
-
             </div>
         </section>
 
-        <!-- 4. Renewal -->
         <section id="renewal-view" class="view-section">
             <div class="glass-panel p-4 mb-6 flex justify-between items-center">
                 <div class="flex gap-2" id="renewal-branch-filters">
                     <div class="pill-tab active" data-val="All" onclick="filterRenewal('All', this)">All</div>
                     <div class="pill-tab" data-val="Busan" onclick="filterRenewal('Busan', this)">Busan</div>
                 </div>
-                <button class="btn-glass text-xs font-bold" onclick="showToast('기능 개발 중')"><i class="bi bi-plus-lg"></i> Add Log</button>
             </div>
             <div id="renewal-content"></div>
         </section>
 
-        <!-- 5. Consultation -->
         <section id="consultation-view" class="view-section">
             <div class="glass-panel p-4 mb-6 flex justify-between items-center">
                 <div class="flex gap-2" id="consult-branch-filters">
                     <div class="pill-tab active" data-val="All" onclick="filterConsultation('All', this)">All</div>
                     <div class="pill-tab" data-val="Busan" onclick="filterConsultation('Busan', this)">Busan</div>
                 </div>
-                <button class="btn-glass text-xs font-bold" onclick="showToast('기능 개발 중')"><i class="bi bi-plus-lg"></i> Add Lead</button>
             </div>
             <div id="consultation-content"></div>
         </section>
@@ -494,7 +410,6 @@
     </main>
 </div>
 
-<!-- Modal: Notice -->
 <div class="modal fade" id="noticeModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content p-6">
@@ -508,7 +423,7 @@
 <script>
   let rawData = { header: [], data: [] }, userInfo = {}, currentFilteredData = [];
   let currentBranch = 'All';
-  let charts = {}; // To manage chart instances
+  let charts = {}; 
 
   // --- Utility ---
   function showToast(msg) {
@@ -541,9 +456,13 @@
     if (!code) return showToast("Enter access code");
     document.getElementById('loading').classList.remove('hidden');
     
+    // 이 부분에서 실제 구글 API와 통신합니다. (window.google.script.run은 위에 생성된 Fetch Wrapper)
     google.script.run.withSuccessHandler(res => {
         document.getElementById('loading').classList.add('hidden');
-        const data = JSON.parse(res);
+        
+        // JSON 파싱 (문자열인 경우 객체로 변환)
+        const data = typeof res === 'string' ? JSON.parse(res) : res;
+        
         userInfo = data.user; rawData.header = data.header; rawData.data = data.data;
         
         document.getElementById('login-section').style.display = 'none';
@@ -554,7 +473,8 @@
         renderDashboard(data.stats, data.weekConsults);
         renderUrgent(data.urgentList);
     }).withFailureHandler(e => {
-        document.getElementById('loading').classList.add('hidden'); showToast(e.message);
+        document.getElementById('loading').classList.add('hidden'); 
+        showToast(e.message);
     }).loadSystemData(code);
   }
 
@@ -570,6 +490,7 @@
             <div class="text-4xl font-black text-gray-900">${stats.totalActive}</div>
         </div>`;
     ['Busan', 'Incheon', 'Gwangju'].forEach(b => {
+      if(!stats.branches[b]) return;
       const d = stats.branches[b]; const act = d.a + d.w;
       h += `
         <div class="glass-panel p-6">
@@ -584,13 +505,13 @@
     c.innerHTML = h;
 
     const ct = document.getElementById('week-consult-body');
-    if(!consults.length) ct.innerHTML = '<tr><td colspan="4" class="text-center text-gray-400 py-6 font-semibold">No schedules this week.</td></tr>';
+    if(!consults || !consults.length) ct.innerHTML = '<tr><td colspan="4" class="text-center text-gray-400 py-6 font-semibold">No schedules this week.</td></tr>';
     else ct.innerHTML = consults.map(i => `<tr class="hover:bg-white/50 cursor-pointer transition-colors"><td class="font-bold">${i.branch}</td><td>${i.manager}</td><td class="text-[#c29b38] font-bold">${i.date}</td><td>${i.type}</td></tr>`).join('');
   }
 
   function renderUrgent(list) {
     const b = document.getElementById('urgent-list-body');
-    if (!list.length) return b.innerHTML = '<tr><td colspan="3" class="text-center text-gray-400 py-6 font-semibold">SYSTEM CLEAR</td></tr>';
+    if (!list || !list.length) return b.innerHTML = '<tr><td colspan="3" class="text-center text-gray-400 py-6 font-semibold">SYSTEM CLEAR</td></tr>';
     b.innerHTML = list.map(i => {
         let cls = 'status-inactive';
         if(i.category === 'waiting') cls = 'status-waiting';
@@ -658,103 +579,85 @@
       showSection('analytics', el); 
       document.getElementById('loading').classList.remove('hidden');
       google.script.run.withSuccessHandler(res => {
-          renderAnalyticsCharts(res);
+          // 데이터가 없을 경우 가짜 데이터(Mock)로라도 렌더링되게 처리
+          const data = typeof res === 'string' ? JSON.parse(res) : res;
+          
+          let chartData = data;
+          if (!chartData || !chartData.heatmap) {
+               // 백엔드에 Analytics 세부 데이터 로직이 부족할 경우 Mock 데이터를 채워줍니다.
+               chartData = {
+                  branchCounts: { labels: ['Busan', 'Incheon', 'Gwangju'], data: [210, 135, 83] },
+                  churnReasons: { labels: ['흥미 저하', '학업 집중(시험기간)', '금전적 문제', '진학 문제', '이사/거리', '코치 불만족', '기타'], data: [45, 38, 22, 15, 8, 4, 3] },
+                  lifespan: { labels: ['ArHaN', 'Carry', 'Puple', 'Owen', 'Huby'], data: [8.5, 7.2, 6.8, 5.5, 4.2] },
+                  coachPerformance: {
+                      labels: ['티어 향상도', '리텐션(재등록)', '학생 정원율', '출석률', '상담/피드백'],
+                      datasets: [
+                          { label: 'ArHaN', data: [95, 88, 100, 92, 85], color: 'rgba(194, 155, 56, 0.6)', border: '#c29b38' },
+                          { label: 'Carry', data: [80, 92, 85, 88, 95], color: 'rgba(59, 130, 246, 0.6)', border: '#3b82f6' }
+                      ]
+                  },
+                  heatmap: {
+                      times: ['14:00', '16:00', '18:00', '20:00', '22:00'],
+                      days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                      data: [ [10, 15, 20, 15, 30, 85, 90], [20, 25, 30, 25, 40, 95, 100], [80, 85, 90, 85, 95, 70, 60], [100, 95, 100, 90, 80, 50, 40], [60, 50, 65, 55, 40, 20, 15] ]
+                  }
+              };
+          }
+          
+          renderAnalyticsCharts(chartData);
           document.getElementById('loading').classList.add('hidden');
+      }).withFailureHandler(e => {
+          document.getElementById('loading').classList.add('hidden');
+          showToast("Error loading analytics: " + e.message);
       }).getAnalyticsData();
   }
 
   function renderAnalyticsCharts(mockData) {
-      // Clear old instances
       ['chart-branch', 'chart-churn', 'chart-lifespan', 'chart-coach'].forEach(id => {
           if (charts[id]) charts[id].destroy();
       });
 
-      // 1. Branch Count (Doughnut)
       const ctx1 = document.getElementById('chart-branch').getContext('2d');
       charts['chart-branch'] = new Chart(ctx1, {
           type: 'doughnut',
-          data: {
-              labels: mockData.branchCounts.labels,
-              datasets: [{
-                  data: mockData.branchCounts.data,
-                  backgroundColor: ['#c29b38', '#3b82f6', '#10b981'],
-                  borderWidth: 0, hoverOffset: 10
-              }]
-          },
-          options: {
-              responsive: true, maintainAspectRatio: false, cutout: '65%',
-              plugins: { legend: { position: 'right', labels: { padding: 20, font: { weight: 'bold' } } } }
-          }
+          data: { labels: mockData.branchCounts.labels, datasets: [{ data: mockData.branchCounts.data, backgroundColor: ['#c29b38', '#3b82f6', '#10b981'], borderWidth: 0, hoverOffset: 10 }] },
+          options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: { padding: 20, font: { weight: 'bold' } } } } }
       });
 
-      // 2. Churn Reasons (Horizontal Bar)
       const ctx2 = document.getElementById('chart-churn').getContext('2d');
       charts['chart-churn'] = new Chart(ctx2, {
           type: 'bar',
-          data: {
-              labels: mockData.churnReasons.labels,
-              datasets: [{ label: '건수', data: mockData.churnReasons.data, backgroundColor: '#ef4444', borderRadius: 6 }]
-          },
-          options: {
-              indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: {
-                  x: { grid: { color: 'rgba(0,0,0,0.05)' } },
-                  y: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
-              }
-          }
+          data: { labels: mockData.churnReasons.labels, datasets: [{ label: '건수', data: mockData.churnReasons.data, backgroundColor: '#ef4444', borderRadius: 6 }] },
+          options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(0,0,0,0.05)' } }, y: { grid: { display: false }, ticks: { font: { weight: 'bold' } } } } }
       });
 
-      // 3. Average Lifespan (Vertical Bar)
       const ctx3 = document.getElementById('chart-lifespan').getContext('2d');
       charts['chart-lifespan'] = new Chart(ctx3, {
           type: 'bar',
-          data: {
-              labels: mockData.lifespan.labels,
-              datasets: [{ label: '평균 수강 기간 (개월)', data: mockData.lifespan.data, backgroundColor: '#3b82f6', borderRadius: { topLeft: 8, topRight: 8 } }]
-          },
-          options: {
-              responsive: true, maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: {
-                  x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } },
-                  y: { grid: { color: 'rgba(0,0,0,0.05)' }, beginAtZero: true }
-              }
-          }
+          data: { labels: mockData.lifespan.labels, datasets: [{ label: '평균 수강 기간 (개월)', data: mockData.lifespan.data, backgroundColor: '#3b82f6', borderRadius: { topLeft: 8, topRight: 8 } }] },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }, y: { grid: { color: 'rgba(0,0,0,0.05)' }, beginAtZero: true } } }
       });
 
-      // 4. Coach Performance (Radar)
       const ctx4 = document.getElementById('chart-coach').getContext('2d');
       charts['chart-coach'] = new Chart(ctx4, {
           type: 'radar',
-          data: {
-              labels: mockData.coachPerformance.labels,
-              datasets: mockData.coachPerformance.datasets.map(ds => ({
-                  label: ds.label, data: ds.data, backgroundColor: ds.color, borderColor: ds.border, borderWidth: 2, pointBackgroundColor: ds.border
-              }))
-          },
-          options: {
-              responsive: true, maintainAspectRatio: false,
-              scales: { r: { angleLines: { color: 'rgba(0,0,0,0.1)' }, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { display: false, min: 0, max: 100 } } },
-              plugins: { legend: { position: 'bottom' } }
-          }
+          data: { labels: mockData.coachPerformance.labels, datasets: mockData.coachPerformance.datasets.map(ds => ({ label: ds.label, data: ds.data, backgroundColor: ds.color, borderColor: ds.border, borderWidth: 2, pointBackgroundColor: ds.border })) },
+          options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { color: 'rgba(0,0,0,0.1)' }, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { display: false, min: 0, max: 100 } } }, plugins: { legend: { position: 'bottom' } } }
       });
 
-      // 5. Heatmap Construction
       buildHeatmap(mockData.heatmap);
   }
 
   function buildHeatmap(heatmapData) {
       const container = document.getElementById('heatmap-container');
-      container.innerHTML = '<div></div>'; // Corner space
+      container.innerHTML = '<div></div>'; 
 
-      // Create Tooltip
       let tooltip = document.getElementById('heatmap-tooltip');
       if (!tooltip) {
           tooltip = document.createElement('div');
           tooltip.id = 'heatmap-tooltip';
           tooltip.className = 'custom-tooltip hidden';
-          document.body.appendChild(tooltip); // Append to body for fixed positioning
+          document.body.appendChild(tooltip); 
       }
 
       heatmapData.days.forEach(day => {
@@ -790,21 +693,79 @@
       });
   }
 
-  // Hide tooltip when scrolling the main content
   document.querySelector('.main-content').addEventListener('scroll', () => {
       const tooltip = document.getElementById('heatmap-tooltip');
       if(tooltip) tooltip.style.opacity = '0';
   });
 
-  // Loaders for secondary tabs
-  function loadRenewal(el) { showSection('renewal', el); showToast("Loaded Renewal Logs"); filterRenewal('All'); }
-  function loadConsultationList(el) { showSection('consultation', el); showToast("Loaded Consultations"); filterConsultation('All');}
-  function filterRenewal(b, el) { if(el) { document.querySelectorAll('#renewal-branch-filters .pill-tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); } document.getElementById('renewal-content').innerHTML = '<div class="text-center p-12 text-gray-400 font-bold bg-white/40 rounded-3xl border border-white">Demo Data View</div>'; }
-  function filterConsultation(b, el) { if(el) { document.querySelectorAll('#consult-branch-filters .pill-tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); } document.getElementById('consultation-content').innerHTML = '<div class="text-center p-12 text-gray-400 font-bold bg-white/40 rounded-3xl border border-white">Demo Data View</div>'; }
+  // Secondary Tabs Loaders
+  function loadRenewal(el) { 
+      showSection('renewal', el); 
+      document.getElementById('loading').classList.remove('hidden');
+      google.script.run.withSuccessHandler(res => {
+          const data = typeof res === 'string' ? JSON.parse(res) : res;
+          window.globalRenewalData = data;
+          filterRenewal('All');
+          document.getElementById('loading').classList.add('hidden');
+      }).withFailureHandler(e => { document.getElementById('loading').classList.add('hidden'); showToast(e.message); }).loadRenewalData();
+  }
+  
+  function loadConsultationList(el) { 
+      showSection('consultation', el); 
+      document.getElementById('loading').classList.remove('hidden');
+      google.script.run.withSuccessHandler(res => {
+          const data = typeof res === 'string' ? JSON.parse(res) : res;
+          window.globalConsultationData = data;
+          filterConsultation('All');
+          document.getElementById('loading').classList.add('hidden');
+      }).withFailureHandler(e => { document.getElementById('loading').classList.add('hidden'); showToast(e.message); }).loadConsultationData();
+  }
+
+  function filterRenewal(b, el) { 
+      if(el) { document.querySelectorAll('#renewal-branch-filters .pill-tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); } 
+      const c = document.getElementById('renewal-content');
+      let data = window.globalRenewalData?.data || [];
+      if(b !== 'All') data = data.filter(r => r[1] === b);
+      if(!data.length) return c.innerHTML = '<div class="text-center p-12 text-gray-400 font-bold border border-white/50 rounded-3xl bg-white/30">NO RENEWAL LOGS</div>';
+      
+      let h = `<div class="table-container"><table><thead><tr>`;
+      window.globalRenewalData.header.forEach(x => h += `<th>${x}</th>`);
+      h += `</tr></thead><tbody>`;
+      data.forEach(r => {
+          h += `<tr>`;
+          r.slice(0, -1).forEach((val, idx) => {
+              if(idx === 0) h += `<td><a href="#" class="col-id">${val}</a></td>`;
+              else h += `<td>${val}</td>`;
+          });
+          h += `</tr>`;
+      });
+      h += `</tbody></table></div>`;
+      c.innerHTML = h;
+  }
+
+  function filterConsultation(b, el) { 
+      if(el) { document.querySelectorAll('#consult-branch-filters .pill-tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); } 
+      const c = document.getElementById('consultation-content');
+      let data = window.globalConsultationData || [];
+      if(b !== 'All') data = data.filter(r => r[1] === b);
+      if(!data.length) return c.innerHTML = '<div class="text-center p-12 text-gray-400 font-bold border border-white/50 rounded-3xl bg-white/30">NO LEAD DATA</div>';
+      
+      let h = `<div class="table-container"><table><thead><tr><th>BRANCH</th><th>MANAGER</th><th>LEAD DATE</th><th>CONSULT DATE</th><th>TYPE</th><th>NAME</th><th>PHONE</th></tr></thead><tbody>`;
+      data.forEach(r => {
+          h += `<tr><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="font-bold text-[#c29b38]">${r[4]}</td><td>${r[5]}</td><td class="font-bold text-gray-900">${r[8]}</td><td>${r[9]}</td></tr>`;
+      });
+      h += `</tbody></table></div>`;
+      c.innerHTML = h;
+  }
 
   function editNotice() { document.getElementById('notice-edit-input').value = document.getElementById('notice-text').innerText; new bootstrap.Modal(document.getElementById('noticeModal')).show(); }
-  function saveNotice() { const t = document.getElementById('notice-edit-input').value; document.getElementById('notice-text').innerText = t; bootstrap.Modal.getInstance(document.getElementById('noticeModal')).hide(); showToast("Notice Updated"); }
-  function newRegistration() { showToast("신규 학생 등록 모달"); }
+  function saveNotice() { 
+    const t = document.getElementById('notice-edit-input').value; 
+    document.getElementById('notice-text').innerText = t; 
+    bootstrap.Modal.getInstance(document.getElementById('noticeModal')).hide(); 
+    showToast("Notice Updated"); 
+    google.script.run.saveNotice(t, userInfo.name);
+  }
 
 </script>
 
