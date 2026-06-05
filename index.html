@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>GGA 데이터 관제 센터</title>
+  <title>GGA BRANCH</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -48,8 +48,8 @@
     .nav-item.active { background: #fff; color: var(--geng-gold); box-shadow: 0 4px 15px rgba(194, 155, 56, 0.15); border: 1px solid rgba(255,255,255,1);}
     
     .main-content { flex: 1; overflow-y: auto; padding: 32px; position: relative; scroll-behavior: smooth; }
-    /* 가로폭 제한을 위한 래퍼 클래스 */
-    .content-wrapper { max-width: 1280px; margin: 0 auto; width: 100%; }
+    /* 1920 해상도 가로 스크롤 방지를 위해 래퍼 폭 확장 */
+    .content-wrapper { max-width: 1650px; margin: 0 auto; width: 100%; }
 
     .view-section { display: none; opacity: 0; }
     .view-section.active { display: block; animation: fadeIn 0.4s ease forwards; }
@@ -64,13 +64,14 @@
     .btn-glass { background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.05); color: var(--text-main); font-weight: 700; border-radius: 12px; padding: 8px 16px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
     .btn-glass:hover { background: #fff; color: var(--geng-gold); border-color: var(--geng-gold); }
 
-    .pill-tab { padding: 6px 16px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.2s; border: 1px solid transparent; white-space: nowrap; }
+    .pill-tab { padding: 8px 16px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.2s; border: 1px solid transparent; white-space: nowrap; }
     .pill-tab:hover { background: rgba(255,255,255,0.8); }
     .pill-tab.active { background: #fff; color: var(--geng-gold); border-color: rgba(0,0,0,0.05); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
     /* === Tables & Cell Colors === */
     .table-container { overflow-x: auto; border-radius: 16px; background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.9); box-shadow: var(--glass-shadow); }
     table { width: 100%; text-align: center; font-size: 0.85rem; border-collapse: collapse; }
+    /* 패딩 축소로 공간 확보 */
     th { background: rgba(255,255,255,0.9); padding: 12px 8px; font-weight: 800; color: var(--text-muted); border-bottom: 2px solid rgba(0,0,0,0.08); white-space: nowrap; position: sticky; top: 0; z-index: 10; text-align: center; }
     td { padding: 10px 8px; border-bottom: 1px solid rgba(0,0,0,0.04); white-space: nowrap; font-weight: 500; transition: 0.2s; cursor: pointer; text-align: center; }
     tr:hover td { background: rgba(255,255,255,0.9); color: var(--geng-gold); }
@@ -189,25 +190,23 @@
 </div>
 <div id="heatmap-tooltip" class="custom-tooltip hidden"></div>
 
-<!-- Login Section -->
 <div id="login-section" class="w-full h-screen flex justify-center items-center px-4 z-10 relative">
   <div class="glass-panel p-10 max-w-md w-full text-center">
-    <div class="mb-6 flex justify-center"><i class="bi bi-hexagon-fill fs-1 text-[#c29b38]"></i></div>
-    <h3 class="font-black mb-2 text-2xl tracking-tight text-gray-900">데이터 관제 센터</h3>
-    <p class="text-sm text-gray-500 mb-8 font-bold">지점 운영 시스템</p>
-    <input type="password" id="access-code" class="form-control-custom mb-5 text-center text-lg" placeholder="접속 코드 (master1234)" onkeyup="if(event.key==='Enter') login()">
+    <div class="mb-6 flex justify-center">
+        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f3/Gen.G_esports_logo.svg/240px-Gen.G_esports_logo.svg.png" alt="Gen.G Logo" style="height: 60px;">
+    </div>
+    <h3 class="font-black mb-8 text-2xl tracking-tight text-gray-900">GGA BRANCH</h3>
+    <input type="password" id="access-code" class="form-control-custom mb-5 text-center text-lg" placeholder="접속 코드" onkeyup="if(event.key==='Enter') login()">
     <button onclick="login()" class="btn-gold w-full py-3 text-lg">로그인</button>
   </div>
 </div>
 
-<!-- Main App Layout -->
 <div id="app-container" class="app-layout hidden">
     
-    <!-- Desktop Sidebar -->
     <aside class="sidebar">
         <div class="flex items-center gap-3 px-2 py-4 mb-4 border-b border-gray-200">
-            <i class="bi bi-hexagon-fill text-2xl text-[#c29b38]"></i>
-            <div><div class="font-black text-sm text-gray-900">GGA CMD</div><div class="text-[11px] font-bold text-gray-500" id="u-name">관리자</div></div>
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f3/Gen.G_esports_logo.svg/240px-Gen.G_esports_logo.svg.png" alt="Gen.G Logo" style="height: 28px;">
+            <div><div class="font-black text-sm text-gray-900">GGA BRANCH</div><div class="text-[11px] font-bold text-gray-500" id="u-name">관리자</div></div>
         </div>
         <div class="nav-item active" data-target="home" onclick="showSection('home', this)"><i class="bi bi-house-door"></i> 메인 대시보드</div>
         <div class="nav-item" data-target="system" onclick="showSection('system', this)"><i class="bi bi-people"></i> 학생 데이터 관리</div>
@@ -217,7 +216,6 @@
         <div class="mt-auto"><div class="nav-item text-red-500 hover:bg-red-50" onclick="location.reload()"><i class="bi bi-box-arrow-left"></i> 로그아웃</div></div>
     </aside>
 
-    <!-- Mobile Bottom Nav -->
     <nav class="mobile-bottom-nav">
         <div class="nav-mob-item active" data-target="home" onclick="showSection('home', this)"><i class="bi bi-house-door"></i>메인</div>
         <div class="nav-mob-item" data-target="system" onclick="showSection('system', this)"><i class="bi bi-people"></i>학생</div>
@@ -226,7 +224,6 @@
         <div class="nav-mob-item" data-target="consultation" onclick="loadConsultationList(this)"><i class="bi bi-telephone"></i>상담</div>
     </nav>
 
-    <!-- Main Content Area -->
     <main class="main-content">
         <div class="content-wrapper">
             <div class="flex justify-between items-center mb-8">
@@ -234,7 +231,6 @@
                 <button class="btn-gold text-sm px-4 py-2 flex items-center gap-2" onclick="openAddModal()"><i class="bi bi-plus-lg"></i> <span class="hidden sm:inline">신규 등록</span></button>
             </div>
 
-            <!-- 1. Home Dashboard -->
             <section id="home-view" class="view-section active">
                 <div class="glass-panel p-6 mb-8 flex justify-between items-start border-l-4 border-l-[#c29b38]">
                     <div>
@@ -244,9 +240,8 @@
                     <button onclick="editNotice()" class="text-gray-400 hover:text-[#c29b38] transition-colors"><i class="bi bi-pencil-square text-xl"></i></button>
                 </div>
                 
-                <div id="dashboard-summary" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"></div>
+                <div id="dashboard-summary" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8"></div>
                 
-                <!-- 복구: 지역/시간별 현황표 (Timeline) -->
                 <div id="timeline-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"></div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -267,11 +262,27 @@
                 </div>
             </section>
 
-            <!-- 2. System Data -->
             <section id="system-view" class="view-section">
                 <div class="glass-panel p-5 mb-6 flex flex-col gap-4">
-                    <!-- 복구: 필터 삭제 후 단순 검색 및 토글 유지 -->
-                    <div class="flex w-full gap-4 items-center flex-col lg:flex-row">
+                    <div class="flex flex-wrap gap-2" id="branch-filters">
+                        <div class="pill-tab active" data-val="All" onclick="setBranch('All', this)">전체 지점</div>
+                        <div class="pill-tab" data-val="Busan" onclick="setBranch('Busan', this)">부산</div>
+                        <div class="pill-tab" data-val="Incheon" onclick="setBranch('Incheon', this)">인천</div>
+                        <div class="pill-tab" data-val="Gwangju" onclick="setBranch('Gwangju', this)">광주</div>
+                    </div>
+                    <div class="flex flex-wrap gap-2" id="coach-filters">
+                        <div class="pill-tab active" data-val="All" onclick="setCoach('All', this)">전체 코치</div>
+                        <div class="pill-tab" data-val="ArHaN" onclick="setCoach('ArHaN', this)">ArHaN</div>
+                        <div class="pill-tab" data-val="Carry" onclick="setCoach('Carry', this)">Carry</div>
+                        <div class="pill-tab" data-val="Puple" onclick="setCoach('Puple', this)">Puple</div>
+                        <div class="pill-tab" data-val="Owen" onclick="setCoach('Owen', this)">Owen</div>
+                        <div class="pill-tab" data-val="Huby" onclick="setCoach('Huby', this)">Huby</div>
+                        <div class="pill-tab" data-val="0tan" onclick="setCoach('0tan', this)">0tan</div>
+                        <div class="pill-tab" data-val="ExiA" onclick="setCoach('ExiA', this)">ExiA</div>
+                        <div class="pill-tab" data-val="Muga" onclick="setCoach('Muga', this)">Muga</div>
+                    </div>
+                    
+                    <div class="flex w-full gap-4 items-center flex-col lg:flex-row mt-2 border-t border-gray-100 pt-4">
                         <div class="relative flex-1 w-full lg:max-w-md">
                             <i class="bi bi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                             <input type="text" id="global-search" class="form-control-custom pl-12 h-11" placeholder="학생 이름/정보 검색..." onkeyup="applyFilters()">
@@ -291,10 +302,8 @@
                 <div id="main-content"></div>
             </section>
 
-            <!-- 3. Analytics -->
             <section id="analytics-view" class="view-section">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <!-- KPI 1: 지점별 비율 (Doughnut with Numbers) -->
                     <div class="glass-panel p-6 flex flex-col">
                         <div class="mb-4 border-b border-white/50 pb-4">
                             <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
@@ -304,7 +313,6 @@
                         <div class="chart-box flex-1"><canvas id="chart-branch"></canvas></div>
                     </div>
                     
-                    <!-- KPI 2: 퇴원 사유 (Pie Chart) -->
                     <div class="glass-panel p-6 flex flex-col">
                         <div class="mb-4 border-b border-white/50 pb-4 flex justify-between items-center">
                             <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
@@ -320,7 +328,6 @@
                         <div class="chart-box flex-1"><canvas id="chart-churn"></canvas></div>
                     </div>
 
-                    <!-- KPI 3: 지점별 학생 수 추이 (Line Chart from DB) -->
                     <div class="glass-panel p-6 flex flex-col lg:col-span-2">
                         <div class="mb-4 border-b border-gray-100 pb-4 flex justify-between items-center">
                             <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
@@ -330,7 +337,6 @@
                         <div class="chart-box flex-1"><canvas id="chart-trend"></canvas></div>
                     </div>
 
-                    <!-- KPI 4: 히트맵 -->
                     <div class="glass-panel p-6 flex flex-col lg:col-span-2">
                         <div class="mb-4 border-b border-gray-100 pb-4">
                             <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
@@ -350,7 +356,6 @@
                 </div>
             </section>
 
-            <!-- 4. Renewal -->
             <section id="renewal-view" class="view-section">
                 <div class="glass-panel p-4 mb-6 flex justify-between items-center">
                     <div class="flex gap-2 bg-white/60 p-2 rounded-2xl border border-white shadow-sm" id="renewal-branch-filters">
@@ -364,7 +369,6 @@
                 <div id="renewal-content"></div>
             </section>
 
-            <!-- 5. Consultation -->
             <section id="consultation-view" class="view-section">
                 <div class="glass-panel p-4 mb-6 flex justify-between items-center">
                     <div class="flex gap-2 bg-white/60 p-2 rounded-2xl border border-white shadow-sm" id="consult-branch-filters">
@@ -381,11 +385,6 @@
     </main>
 </div>
 
-<!-- ========================================== -->
-<!-- MODALS -->
-<!-- ========================================== -->
-
-<!-- Notice Edit Modal -->
 <div class="modal fade" id="noticeModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-panel p-6 border-0">
@@ -396,7 +395,6 @@
     </div>
 </div>
 
-<!-- 💡 혁신적인 2단 그리드 Edit Modal (넓고 편리한 레이아웃) -->
 <div class="modal fade" id="editModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content glass-panel border-0 p-0 overflow-hidden">
@@ -409,7 +407,6 @@
             </div>
             <div class="p-6 bg-[#f8fafc]">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- 왼쪽 열: 데이터 값 변경 & 메모 작성 -->
                     <div class="flex flex-col gap-5">
                         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                             <label class="block text-sm font-black text-gray-800 mb-3"><i class="bi bi-pencil-square text-[#c29b38]"></i> 선택한 항목 값 변경</label>
@@ -426,7 +423,6 @@
                         </div>
                     </div>
                     
-                    <!-- 오른쪽 열: 상담 일지 & 연장 사유 -->
                     <div class="flex flex-col gap-5">
                         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex-1 flex flex-col">
                             <label class="block text-sm font-black text-gray-800 mb-3"><i class="bi bi-journal-text text-emerald-500"></i> 상담 일지 작성</label>
@@ -446,7 +442,6 @@
     </div>
 </div>
 
-<!-- Add Student Modal -->
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content glass-panel border-0 p-6">
@@ -469,7 +464,6 @@
     </div>
 </div>
 
-<!-- Lead/Consult Modal -->
 <div class="modal fade" id="leadModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content glass-panel border-0 p-6">
@@ -491,7 +485,6 @@
     </div>
 </div>
 
-<!-- Renewal Modal -->
 <div class="modal fade" id="renewalModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-panel border-0 p-6">
@@ -523,9 +516,9 @@
 
 <script>
   let rawData = { header: [], data: [] }, userInfo = {}, currentFilteredData = [];
-  let dropdownRules = []; let charts = {}; 
+  let currentBranch = 'All', currentCoach = 'All', activeFilters = {}, dropdownRules = [];
+  let charts = {}; 
   
-  // Analytics Processed Data
   let processedAnalytics = { branchCounts: { labels: [], data: [] }, churnData: [], heatmapData: { times: ['14:00','16:00','18:00','20:00','22:00'], days: ['월','화','수','목','금','토','일'], data: [] } };
   const tierScores = {'Unrated':0,'아이언':1,'브1':2,'브2':3,'브3':4,'실1':5,'실2':6,'실3':7,'골1':8,'골2':9,'골3':10,'플1':11,'플2':12,'플3':13,'다1':14,'다2':15,'다3':16,'초1':17,'초2':18,'초3':19,'불1':20,'불2':21,'불3':22,'레디':23};
   const TIER_MAP_CLIENT = tierScores;
@@ -584,7 +577,7 @@
   function renderDashboard(stats, consults) {
     const c = document.getElementById('dashboard-summary');
     let h = `
-        <div class="glass-panel p-6 flex flex-col justify-between border-0 bg-white">
+        <div class="glass-panel p-6 flex flex-col justify-between" style="background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,240,0.8)); border:none;">
             <div class="flex items-center justify-between mb-4"><span class="font-black text-[#c29b38] uppercase tracking-wide text-sm">전체 수강생</span><i class="bi bi-people-fill text-gray-300 text-2xl"></i></div>
             <div class="text-4xl font-black text-gray-900">${stats.totalActive}</div>
         </div>`;
@@ -620,7 +613,6 @@
     }).join('');
   }
 
-  // --- 복구: 지역/시간별 현황표 (Timeline) ---
   function renderTimeline(data) {
     var container = document.getElementById('timeline-container');
     if (!container) return; if (!data || data.length === 0) { container.innerHTML = ''; return; }
@@ -639,8 +631,8 @@
     var branchesToRender = branchOrder.filter(b => timelineData[b] != null && (userInfo.region === 'Master' || userInfo.region === 'Admin' || userInfo.region === b));
 
     branchesToRender.forEach(branch => {
-      html += `<div class="glass-panel p-4 mb-4 shadow-sm border border-gray-100">
-                <h5 class="fw-bold mb-3 border-start border-4 ps-2 border-[#c29b38] text-gray-900 text-base"><i class="bi bi-geo-alt-fill me-2 text-[#c29b38]"></i>${bNames[branch]} 클래스 현황</h5>
+      html += `<div class="glass-panel p-5 mb-5 shadow-sm border border-gray-100">
+                <h5 class="fw-bold mb-4 border-l-4 ps-3 border-[#c29b38] text-gray-900 text-base flex items-center gap-2"><i class="bi bi-geo-alt-fill text-[#c29b38]"></i>${bNames[branch]} 클래스 현황</h5>
                 <div class="table-container shadow-none border-0"><table class="w-full text-center text-sm">
                 <thead><tr><th class="text-center">코치</th><th class="text-center">목금 18시</th><th class="text-center">주말 10시</th><th class="text-center">주말 14시</th><th class="text-center">주말 18시</th><th class="text-center">기타</th><th class="bg-gray-100 text-center">총원</th></tr></thead><tbody>`;
       
@@ -667,14 +659,11 @@
     container.innerHTML = html;
   }
 
-  let activeFilters = { branch: 'All' };
-  
   function goToTimeline(branch, coach, slot) {
-    document.getElementById('global-search').value = ''; 
-    document.getElementById('st-inactive').checked = false;
-    document.getElementById('class-view-toggle').checked = false; // Disable group view to show row list
+    currentBranch = branch; currentCoach = coach; activeFilters = {}; 
+    document.getElementById('global-search').value = ''; document.getElementById('st-inactive').checked = false;
+    document.getElementById('class-view-toggle').checked = false; 
     
-    // Clear array filters and use manual filter function
     let filtered = rawData.data.filter(item => {
         var v = item.values;
         if (v[1] !== branch || (v[4] || "미배정") !== coach) return false;
@@ -689,7 +678,7 @@
     
     document.querySelectorAll('.pill-tab').forEach(e => e.classList.remove('active'));
     showSection('system');
-    renderContent(filtered, false); // false = don't group
+    renderContent(filtered, false); 
   }
 
   function goToDetail(row) {
@@ -709,9 +698,8 @@
     let filtered = rawData.data.filter(item => {
         if (!showInactive && item.values[2] === 'Inactive') return false;
         if (key && !item.values.some(v => String(v).toLowerCase().includes(key))) return false;
-        // Apply select filters (columns)
         for (let idx in activeFilters) { 
-           if(idx === 'branch') continue; // handled via dropdown if needed
+           if(idx === 'branch') continue; 
            if (activeFilters[idx] && item.values[idx] !== activeFilters[idx]) return false; 
         } 
         return true;
@@ -736,7 +724,7 @@
             let tsKR = 0, cntKR = 0;
             groups[groupName].forEach(s => { const tKR = String(s.values[15]).trim().replace(/\s+/g, ''); if (TIER_MAP_CLIENT[tKR]) { tsKR += TIER_MAP_CLIENT[tKR]; cntKR++; }});
             const avgKR = cntKR > 0 ? REVERSE_TIER_MAP[Math.round(tsKR / cntKR)] : "-";
-            container.innerHTML += buildTableHTML(groups[groupName], groupName + ` <span class="avg-tier-badge bg-gray-800">KR 평균: ${avgKR}</span>`);
+            container.innerHTML += buildTableHTML(groups[groupName], groupName + ` <span class="px-3 py-1 bg-[#c29b38]/10 text-[#c29b38] border border-[#c29b38]/20 rounded-full text-xs ms-3 align-middle font-bold">KR 평균: ${avgKR}</span>`);
         });
     } else {
         container.innerHTML = buildTableHTML(data, "전체 학생 목록");
@@ -744,15 +732,13 @@
   }
 
   function buildTableHTML(dataList, title) {
-    let html = `<div class="mb-8"><h3 class="text-lg font-black text-gray-800 mb-3 pl-2 border-l-4 border-[#c29b38]">${title} <span class="text-sm font-bold text-gray-400 ml-2">(${dataList.length}명)</span></h3>`;
+    let html = `<div class="mb-8"><h3 class="text-lg font-black text-gray-800 mb-3 pl-3 border-l-4 border-[#c29b38] flex items-center">${title} <span class="text-sm font-bold text-gray-400 ml-2">(${dataList.length}명)</span></h3>`;
     html += `<div class="table-container"><table class="w-full text-center text-sm"><thead><tr>`;
     
     rawData.header.forEach((h, i) => { 
         if(i === 20 || i === 21) return;
         let mobileClass = ([5,6,11,13,14,16,17].includes(i)) ? "mobile-hide" : "";
-        let s = `<select class='col-filter-select text-center' onchange='activeFilters[${i}]=this.value==="All"?undefined:this.value;applyFilters();'><option value="All">필터</option>`;
-        if (rawData.data && rawData.data.length > 0) { const o = [...new Set(rawData.data.map(r => r.values[i]))].filter(v => v).sort(); o.forEach(v => { s += `<option value="${v}" ${activeFilters[i] === v ? 'selected' : ''}>${v}</option>`; }); }
-        html += `<th class="${mobileClass} text-center">${h}<br>${s}</select></th>`; 
+        html += `<th class="${mobileClass} text-center">${h}</th>`; 
     });
     html += `</tr></thead><tbody>`;
     
@@ -779,6 +765,7 @@
                 if(v==='Waiting') badge='status-waiting'; if(v==='Loading') badge='status-loading'; if(v==='Inactive') badge='status-inactive';
                 cell = `<span class="badge-status ${badge}">${v}</span>`;
             }
+
             html += `<td id="cell-${item.rowNum}-${i}" class="${mobileClass}" data-label="${rawData.header[i]}" ${onClick}>${cell}</td>`;
         });
         html += `</tr>`;
@@ -793,7 +780,9 @@
     return html;
   }
 
-  // --- 💡 Edit Modal (2단 레이아웃 개편) ---
+  function setBranch(v, el) { currentBranch = v; document.querySelectorAll('#branch-filters .pill-tab').forEach(b => b.classList.remove('active')); if(el) el.classList.add('active'); activeFilters['branch'] = v; applyFilters(); }
+  function setCoach(v, el) { currentCoach = v; document.querySelectorAll('#coach-filters .pill-tab').forEach(b => b.classList.remove('active')); if(el) el.classList.add('active'); activeFilters['coach'] = v; applyFilters(); }
+
   function openEdit(r, c) { 
       const s = rawData.data.find(d => d.rowNum === r); if (!s) return; 
       
@@ -866,12 +855,10 @@
   function submitComment() { const r = parseInt(document.getElementById('m-row').value); const v = document.getElementById('comment-input').value; if (!v) return showToast("내용을 입력하세요."); const now = new Date(); const fullMsg = `[${now.getMonth()+1}/${now.getDate()} ${userInfo.name}] ${v}`; const s = rawData.data.find(d => d.rowNum === r); if (s) { s.comment = fullMsg; s.commentHistory = (s.commentHistory ? s.commentHistory + "\n" : "") + fullMsg; } bootstrap.Modal.getInstance(document.getElementById('editModal')).hide(); applyFilters(); google.script.run.withSuccessHandler(()=>showToast("등록되었습니다.")).saveComment(r, v, userInfo.name); }
   function toggleComment(r) { google.script.run.withSuccessHandler(() => { const s = rawData.data.find(d => d.rowNum === r); if (s) s.comment = ""; applyFilters(); showToast("삭제되었습니다."); }).clearComment(r); }
 
-  // --- Analytics Renderers (도넛/원형 및 지점 필터) ---
   function loadAnalytics(el) {
       showSection('analytics', el); document.getElementById('loading').classList.remove('hidden');
       google.script.run.withSuccessHandler(res => {
           const data = typeof res === 'string' ? JSON.parse(res) : res;
-          
           let churn = { 'Busan': {}, 'Incheon': {}, 'Gwangju': {}, 'All': {} };
           if(window.globalRenewalData && window.globalRenewalData.data) {
               window.globalRenewalData.data.forEach(r => {
@@ -965,7 +952,6 @@
 
   document.querySelector('.main-content').addEventListener('scroll', () => { const t = document.getElementById('heatmap-tooltip'); if(t) t.style.opacity = '0'; });
 
-  // --- Loaders ---
   function loadConsultationList() { showSection('consultation'); setLoading(true); google.script.run.withSuccessHandler(res => { const data = typeof res === 'string' ? JSON.parse(res) : res; window.globalConsultationData = data; filterConsultation('All'); setLoading(false); }).loadConsultationData(); }
   function filterConsultation(b, el) { 
       if(el) { document.querySelectorAll('#consult-branch-filters .pill-tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); } 
