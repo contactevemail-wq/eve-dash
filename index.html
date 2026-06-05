@@ -37,8 +37,6 @@
 
     /* === Glass Panels === */
     .glass-panel { background: var(--glass-bg); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border-radius: 20px; border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); transition: all 0.3s ease; }
-    .geng-panel-glow { position: relative; background: var(--glass-bg); backdrop-filter: blur(24px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); transition: transform 0.3s ease, box-shadow 0.3s ease; z-index: 1; }
-    .geng-panel-glow:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(194, 155, 56, 0.1), inset 0 1px 0 rgba(255,255,255,1); }
 
     /* === Layout === */
     .app-layout { display: flex; height: 100vh; width: 100vw; }
@@ -48,7 +46,6 @@
     .nav-item.active { background: #fff; color: var(--geng-gold); box-shadow: 0 4px 15px rgba(194, 155, 56, 0.15); border: 1px solid rgba(255,255,255,1);}
     
     .main-content { flex: 1; overflow-y: auto; padding: 32px; position: relative; scroll-behavior: smooth; }
-    /* 1920 해상도 가로 스크롤 방지를 위해 래퍼 폭 확장 */
     .content-wrapper { max-width: 1650px; margin: 0 auto; width: 100%; }
 
     .view-section { display: none; opacity: 0; }
@@ -68,10 +65,9 @@
     .pill-tab:hover { background: rgba(255,255,255,0.8); }
     .pill-tab.active { background: #fff; color: var(--geng-gold); border-color: rgba(0,0,0,0.05); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-    /* === Tables & Cell Colors === */
+    /* === Tables === */
     .table-container { overflow-x: auto; border-radius: 16px; background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.9); box-shadow: var(--glass-shadow); }
     table { width: 100%; text-align: center; font-size: 0.85rem; border-collapse: collapse; }
-    /* 패딩 축소로 공간 확보 */
     th { background: rgba(255,255,255,0.9); padding: 12px 8px; font-weight: 800; color: var(--text-muted); border-bottom: 2px solid rgba(0,0,0,0.08); white-space: nowrap; position: sticky; top: 0; z-index: 10; text-align: center; }
     td { padding: 10px 8px; border-bottom: 1px solid rgba(0,0,0,0.04); white-space: nowrap; font-weight: 500; transition: 0.2s; cursor: pointer; text-align: center; }
     tr:hover td { background: rgba(255,255,255,0.9); color: var(--geng-gold); }
@@ -92,7 +88,6 @@
     .comment-row td { background-color: rgba(194, 155, 56, 0.04) !important; padding: 0 !important; border-bottom: 1px solid rgba(0,0,0,0.05); }
     .comment-content { display: flex; align-items: center; gap: 8px; padding: 8px 16px; font-weight: 600; color: #64748b; font-size: 0.8rem; text-align: left; justify-content: center;} 
 
-    /* === Timeline (현황표) === */
     .timeline-click { cursor: pointer; transition: 0.2s; }
     .timeline-click:hover { background-color: rgba(194,155,56,0.08); border-radius: 6px; color: var(--geng-gold);}
 
@@ -112,11 +107,10 @@
     
     .modal-content { background: rgba(250, 251, 253, 0.98); backdrop-filter: blur(40px); border-radius: 24px; border: 1px solid #fff; box-shadow: 0 30px 60px rgba(0,0,0,0.15); }
     
-    /* Edit Modal Custom Tabs */
     .edit-tab-btn { transition: 0.2s; }
     .edit-tab-btn.active { background: #fff; color: var(--geng-gold); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 
-    /* Mobile Responsive */
+    /* === Mobile Responsive === */
     .mobile-bottom-nav { display: none; }
     @media (max-width: 1024px) {
       .sidebar { display: none; }
@@ -143,7 +137,7 @@
 
   <script>
     // =========================================================================
-    // 🚀 실제 구글 웹앱 URL (Vercel 배포 시 동작)
+    // 🚀 실제 구글 웹앱 URL
     // =========================================================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzULuXhd5kYroOSwIpF08Ss57Hu1UQjyzWAcc3ABIS_4bbmgJx9v2YY_YPlYnkR3NU/exec";
     
@@ -176,7 +170,6 @@
         return runner;
     }
     window.google = { script: { run: createLiveRunner(null, null) } };
-    
     Chart.defaults.color = '#64748b'; 
     Chart.defaults.font.family = "'Pretendard', sans-serif"; 
   </script>
@@ -190,10 +183,12 @@
 </div>
 <div id="heatmap-tooltip" class="custom-tooltip hidden"></div>
 
+<!-- Login Section -->
 <div id="login-section" class="w-full h-screen flex justify-center items-center px-4 z-10 relative">
   <div class="glass-panel p-10 max-w-md w-full text-center">
+    <!-- 📌 고화질 원본 SVG 링크 직접 연결 (업로드 불필요) -->
     <div class="mb-6 flex justify-center">
-        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f3/Gen.G_esports_logo.svg/240px-Gen.G_esports_logo.svg.png" alt="Gen.G Logo" style="height: 60px;">
+        <img src="https://upload.wikimedia.org/wikipedia/en/f/f3/Gen.G_esports_logo.svg" alt="Gen.G Logo" style="height: 60px; object-fit: contain;" onerror="this.outerHTML='<i class=\'bi bi-hexagon-fill fs-1 text-[#c29b38]\'></i>'">
     </div>
     <h3 class="font-black mb-8 text-2xl tracking-tight text-gray-900">GGA BRANCH</h3>
     <input type="password" id="access-code" class="form-control-custom mb-5 text-center text-lg" placeholder="접속 코드" onkeyup="if(event.key==='Enter') login()">
@@ -201,11 +196,14 @@
   </div>
 </div>
 
+<!-- Main App Layout -->
 <div id="app-container" class="app-layout hidden">
     
+    <!-- Desktop Sidebar -->
     <aside class="sidebar">
         <div class="flex items-center gap-3 px-2 py-4 mb-4 border-b border-gray-200">
-            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f3/Gen.G_esports_logo.svg/240px-Gen.G_esports_logo.svg.png" alt="Gen.G Logo" style="height: 28px;">
+            <!-- 📌 사이드바 고화질 SVG 로고 적용 -->
+            <img src="https://upload.wikimedia.org/wikipedia/en/f/f3/Gen.G_esports_logo.svg" alt="Gen.G" style="height: 28px; object-fit: contain;" onerror="this.outerHTML='<i class=\'bi bi-hexagon-fill fs-4 text-[#c29b38]\'></i>'">
             <div><div class="font-black text-sm text-gray-900">GGA BRANCH</div><div class="text-[11px] font-bold text-gray-500" id="u-name">관리자</div></div>
         </div>
         <div class="nav-item active" data-target="home" onclick="showSection('home', this)"><i class="bi bi-house-door"></i> 메인 대시보드</div>
@@ -216,6 +214,7 @@
         <div class="mt-auto"><div class="nav-item text-red-500 hover:bg-red-50" onclick="location.reload()"><i class="bi bi-box-arrow-left"></i> 로그아웃</div></div>
     </aside>
 
+    <!-- Mobile Bottom Nav -->
     <nav class="mobile-bottom-nav">
         <div class="nav-mob-item active" data-target="home" onclick="showSection('home', this)"><i class="bi bi-house-door"></i>메인</div>
         <div class="nav-mob-item" data-target="system" onclick="showSection('system', this)"><i class="bi bi-people"></i>학생</div>
@@ -224,6 +223,7 @@
         <div class="nav-mob-item" data-target="consultation" onclick="loadConsultationList(this)"><i class="bi bi-telephone"></i>상담</div>
     </nav>
 
+    <!-- Main Content Area -->
     <main class="main-content">
         <div class="content-wrapper">
             <div class="flex justify-between items-center mb-8">
@@ -262,6 +262,7 @@
                 </div>
             </section>
 
+            <!-- 2. System Data -->
             <section id="system-view" class="view-section">
                 <div class="glass-panel p-5 mb-6 flex flex-col gap-4">
                     <div class="flex flex-wrap gap-2" id="branch-filters">
@@ -302,6 +303,7 @@
                 <div id="main-content"></div>
             </section>
 
+            <!-- 3. Analytics -->
             <section id="analytics-view" class="view-section">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                     <div class="glass-panel p-6 flex flex-col">
@@ -356,6 +358,7 @@
                 </div>
             </section>
 
+            <!-- 4. Renewal -->
             <section id="renewal-view" class="view-section">
                 <div class="glass-panel p-4 mb-6 flex justify-between items-center">
                     <div class="flex gap-2 bg-white/60 p-2 rounded-2xl border border-white shadow-sm" id="renewal-branch-filters">
@@ -369,6 +372,7 @@
                 <div id="renewal-content"></div>
             </section>
 
+            <!-- 5. Consultation -->
             <section id="consultation-view" class="view-section">
                 <div class="glass-panel p-4 mb-6 flex justify-between items-center">
                     <div class="flex gap-2 bg-white/60 p-2 rounded-2xl border border-white shadow-sm" id="consult-branch-filters">
@@ -384,6 +388,10 @@
         </div>
     </main>
 </div>
+
+<!-- ========================================== -->
+<!-- MODALS -->
+<!-- ========================================== -->
 
 <div class="modal fade" id="noticeModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -516,6 +524,7 @@
 
 <script>
   let rawData = { header: [], data: [] }, userInfo = {}, currentFilteredData = [];
+  // 💡 필터 버그 수정: 초기 activeFilters 설정 및 필터링 시 branch, coach 예외 처리 명확화
   let currentBranch = 'All', currentCoach = 'All', activeFilters = {}, dropdownRules = [];
   let charts = {}; 
   
@@ -527,7 +536,7 @@
   function showToast(msg) {
     const box = document.getElementById('toast-container');
     const el = document.createElement('div'); el.className = 'toast-msg flex items-center gap-2';
-    el.innerHTML = `<div class="w-6 h-6 rounded-full bg-[#c29b38]/20 flex items-center justify-center"><i class="bi bi-check-lg text-[#c29b38]"></i></div> ${msg}`;
+    el.innerHTML = `<i class="bi bi-check-lg text-[#c29b38]"></i> ${msg}`;
     box.appendChild(el);
     setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(10px)'; setTimeout(() => el.remove(), 300); }, 2500);
   }
@@ -632,7 +641,7 @@
 
     branchesToRender.forEach(branch => {
       html += `<div class="glass-panel p-5 mb-5 shadow-sm border border-gray-100">
-                <h5 class="fw-bold mb-4 border-l-4 ps-3 border-[#c29b38] text-gray-900 text-base flex items-center gap-2"><i class="bi bi-geo-alt-fill text-[#c29b38]"></i>${bNames[branch]} 클래스 현황</h5>
+                <h5 class="fw-bold mb-4 border-l-4 ps-3 border-[#c29b38] text-gray-900 text-base flex items-center gap-2">${bNames[branch]} 클래스 현황</h5>
                 <div class="table-container shadow-none border-0"><table class="w-full text-center text-sm">
                 <thead><tr><th class="text-center">코치</th><th class="text-center">목금 18시</th><th class="text-center">주말 10시</th><th class="text-center">주말 14시</th><th class="text-center">주말 18시</th><th class="text-center">기타</th><th class="bg-gray-100 text-center">총원</th></tr></thead><tbody>`;
       
@@ -684,10 +693,27 @@
   function goToDetail(row) {
     document.getElementById('global-search').value = ''; 
     document.getElementById('class-view-toggle').checked = false; 
-    activeFilters = { branch: 'All' };
-    showSection('system');
+    activeFilters = {}; 
+    currentBranch = 'All'; currentCoach = 'All';
+    document.querySelectorAll('.pill-tab').forEach(e => e.classList.remove('active'));
+    document.querySelectorAll('[data-val="All"]').forEach(e => e.classList.add('active'));
     
+    showSection('system');
     setTimeout(() => { const tr = document.getElementById('row-' + row); if (tr) { tr.scrollIntoView({ block: 'center', behavior: 'smooth' }); tr.classList.add('row-highlight'); setTimeout(() => tr.classList.remove('row-highlight'), 2000); } }, 600);
+  }
+
+  // 💡 필터 버그 수정 (branch, coach 탭 적용 완벽화)
+  function setBranch(v, el) { 
+      currentBranch = v; 
+      document.querySelectorAll('#branch-filters .pill-tab').forEach(b => b.classList.remove('active')); 
+      if(el) el.classList.add('active'); 
+      applyFilters(); 
+  }
+  function setCoach(v, el) { 
+      currentCoach = v; 
+      document.querySelectorAll('#coach-filters .pill-tab').forEach(b => b.classList.remove('active')); 
+      if(el) el.classList.add('active'); 
+      applyFilters(); 
   }
 
   function applyFilters() {
@@ -696,11 +722,15 @@
     const isClassView = document.getElementById('class-view-toggle').checked;
     
     let filtered = rawData.data.filter(item => {
-        if (!showInactive && item.values[2] === 'Inactive') return false;
-        if (key && !item.values.some(v => String(v).toLowerCase().includes(key))) return false;
+        const v = item.values;
+        if (currentBranch !== 'All' && v[1] !== currentBranch) return false;
+        if (currentCoach !== 'All' && (v[4] || "미배정") !== currentCoach) return false;
+        if (!showInactive && v[2] === 'Inactive') return false;
+        if (key && !v.some(val => String(val).toLowerCase().includes(key))) return false;
+        
         for (let idx in activeFilters) { 
-           if(idx === 'branch') continue; 
-           if (activeFilters[idx] && item.values[idx] !== activeFilters[idx]) return false; 
+           if(idx === 'branch' || idx === 'coach') continue; 
+           if (activeFilters[idx] && v[idx] !== activeFilters[idx]) return false; 
         } 
         return true;
     });
@@ -780,9 +810,6 @@
     return html;
   }
 
-  function setBranch(v, el) { currentBranch = v; document.querySelectorAll('#branch-filters .pill-tab').forEach(b => b.classList.remove('active')); if(el) el.classList.add('active'); activeFilters['branch'] = v; applyFilters(); }
-  function setCoach(v, el) { currentCoach = v; document.querySelectorAll('#coach-filters .pill-tab').forEach(b => b.classList.remove('active')); if(el) el.classList.add('active'); activeFilters['coach'] = v; applyFilters(); }
-
   function openEdit(r, c) { 
       const s = rawData.data.find(d => d.rowNum === r); if (!s) return; 
       
@@ -836,7 +863,7 @@
       const cell = document.getElementById(`cell-${r}-${c}`); if (cell) cell.innerHTML = disp; 
       
       bootstrap.Modal.getInstance(document.getElementById('editModal')).hide(); 
-      showToast("데이터 업데이트 중...");
+      showToast("데이터 동기화 중...");
       google.script.run.withSuccessHandler(()=> { showToast("수정 완료"); applyFilters(); }).updateStudentData(r, c, v, userInfo.name); 
       
       if (c === 2 && v === 'Inactive' && oldStatus !== 'Inactive') { setTimeout(() => { document.getElementById('rn-id').value = studentId; document.getElementById('rn-status').value = 'Out'; new bootstrap.Modal(document.getElementById('renewalModal')).show(); }, 500); } 
@@ -859,6 +886,7 @@
       showSection('analytics', el); document.getElementById('loading').classList.remove('hidden');
       google.script.run.withSuccessHandler(res => {
           const data = typeof res === 'string' ? JSON.parse(res) : res;
+          
           let churn = { 'Busan': {}, 'Incheon': {}, 'Gwangju': {}, 'All': {} };
           if(window.globalRenewalData && window.globalRenewalData.data) {
               window.globalRenewalData.data.forEach(r => {
@@ -952,7 +980,20 @@
 
   document.querySelector('.main-content').addEventListener('scroll', () => { const t = document.getElementById('heatmap-tooltip'); if(t) t.style.opacity = '0'; });
 
-  function loadConsultationList() { showSection('consultation'); setLoading(true); google.script.run.withSuccessHandler(res => { const data = typeof res === 'string' ? JSON.parse(res) : res; window.globalConsultationData = data; filterConsultation('All'); setLoading(false); }).loadConsultationData(); }
+  // 💡 리드/상담 목록 불러오기 복구
+  function loadConsultationList(el) { 
+      showSection('consultation', el); 
+      setLoading(true); 
+      google.script.run.withSuccessHandler(res => { 
+          setLoading(false); 
+          try {
+              const data = typeof res === 'string' ? JSON.parse(res) : res; 
+              window.globalConsultationData = data; 
+              filterConsultation('All', document.querySelector('#consult-branch-filters .pill-tab[data-val="All"]')); 
+          } catch(err) { showToast("데이터 불러오기 오류"); }
+      }).withFailureHandler(e => { setLoading(false); showToast("오류: " + e.message); }).loadConsultationData(); 
+  }
+  
   function filterConsultation(b, el) { 
       if(el) { document.querySelectorAll('#consult-branch-filters .pill-tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); } 
       const c = document.getElementById('consultation-content'); let data = window.globalConsultationData || []; if(b !== 'All') data = data.filter(r => r[1] === b);
@@ -963,7 +1004,20 @@
       c.innerHTML = h + `</tbody></table></div>`;
   }
   
-  function loadRenewal() { showSection('renewal'); setLoading(true); google.script.run.withSuccessHandler(res => { const data = typeof res === 'string' ? JSON.parse(res) : res; window.globalRenewalData = data; filterRenewal('All'); setLoading(false); }).loadRenewalData(); }
+  // 💡 수강 연장 기록 불러오기 복구
+  function loadRenewal(el) { 
+      showSection('renewal', el); 
+      setLoading(true); 
+      google.script.run.withSuccessHandler(res => { 
+          setLoading(false); 
+          try {
+              const data = typeof res === 'string' ? JSON.parse(res) : res; 
+              window.globalRenewalData = data; 
+              filterRenewal('All', document.querySelector('#renewal-branch-filters .pill-tab[data-val="All"]')); 
+          } catch(err) { showToast("데이터 불러오기 오류"); }
+      }).withFailureHandler(e => { setLoading(false); showToast("오류: " + e.message); }).loadRenewalData(); 
+  }
+  
   function filterRenewal(b, el) { 
       if(el) { document.querySelectorAll('#renewal-branch-filters .pill-tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); } 
       const c = document.getElementById('renewal-content'); let data = window.globalRenewalData?.data || []; if(b !== 'All') data = data.filter(r => r[1] === b);
@@ -986,11 +1040,11 @@
       new bootstrap.Modal(document.getElementById('leadModal')).show();
   }
   function submitNewStudent() { bootstrap.Modal.getInstance(document.getElementById('addModal')).hide(); showToast("등록 요청 중..."); google.script.run.withSuccessHandler(()=>showToast("등록 완료")).addNewStudent(JSON.stringify({id:"N100"}), userInfo.name); }
-  function submitLead() { bootstrap.Modal.getInstance(document.getElementById('leadModal')).hide(); showToast("상담 내용 저장 중..."); google.script.run.withSuccessHandler(()=>loadConsultationList()).updateConsultation(JSON.stringify({})); }
-  function deleteLead() { bootstrap.Modal.getInstance(document.getElementById('leadModal')).hide(); showToast("상담 기록 삭제 중..."); google.script.run.withSuccessHandler(()=>loadConsultationList()).deleteConsultation(JSON.stringify({row: document.getElementById('ld-row').value})); }
+  function submitLead() { bootstrap.Modal.getInstance(document.getElementById('leadModal')).hide(); showToast("상담 내용 저장 중..."); google.script.run.withSuccessHandler(()=>loadConsultationList(null)).updateConsultation(JSON.stringify({})); }
+  function deleteLead() { bootstrap.Modal.getInstance(document.getElementById('leadModal')).hide(); showToast("상담 기록 삭제 중..."); google.script.run.withSuccessHandler(()=>loadConsultationList(null)).deleteConsultation(JSON.stringify({row: document.getElementById('ld-row').value})); }
   function openRenewalModal(defaultId, defaultStatus) { if (defaultId === undefined) defaultId = ''; if (defaultStatus === undefined) defaultStatus = 'Renewal'; document.getElementById('rn-id').value = defaultId; document.getElementById('rn-date').valueAsDate = new Date(); document.getElementById('rn-status').value = defaultStatus; document.getElementById('rn-note').value = ''; toggleRenewalTags(); new bootstrap.Modal(document.getElementById('renewalModal')).show(); }
   function toggleRenewalTags() { const st = document.getElementById('rn-status').value; document.getElementById('rn-tag-container').style.display = st === 'Out' ? 'block' : 'none'; }
-  function submitRenewal() { bootstrap.Modal.getInstance(document.getElementById('renewalModal')).hide(); showToast("기록 저장 중..."); google.script.run.withSuccessHandler(()=>loadRenewal()).addNewRenewal(JSON.stringify({id: document.getElementById('rn-id').value}), userInfo.name); }
+  function submitRenewal() { bootstrap.Modal.getInstance(document.getElementById('renewalModal')).hide(); showToast("기록 저장 중..."); google.script.run.withSuccessHandler(()=>loadRenewal(null)).addNewRenewal(JSON.stringify({id: document.getElementById('rn-id').value}), userInfo.name); }
 </script>
 
 </body>
