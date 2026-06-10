@@ -98,9 +98,6 @@
     @keyframes toastAnim { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
     
     .modal-content { background: rgba(250, 251, 253, 0.98); backdrop-filter: blur(40px); border-radius: 24px; border: 1px solid #fff; box-shadow: 0 30px 60px rgba(0,0,0,0.15); }
-    
-    .edit-tab-btn { transition: 0.2s; }
-    .edit-tab-btn.active { background: #fff; color: var(--geng-gold); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 
     /* === Mobile Responsive === */
     .mobile-bottom-nav { display: none; }
@@ -122,7 +119,7 @@
   </style>
 
   <script>
-    // 🚀 실제 구글 웹앱 URL (Vercel 배포 시 동작)
+    // 🚀 실제 구글 웹앱 URL
     const API_URL = "https://script.google.com/macros/s/AKfycbzULuXhd5kYroOSwIpF08Ss57Hu1UQjyzWAcc3ABIS_4bbmgJx9v2YY_YPlYnkR3NU/exec";
     
     function createLiveRunner(sCb, fCb) {
@@ -177,7 +174,7 @@
 <div id="login-section" class="w-full h-screen flex justify-center items-center px-4 z-10 relative">
   <div class="glass-panel p-10 max-w-md w-full text-center">
     <div class="mb-6 flex justify-center">
-        <img src="./logo.png" alt="Gen.G Logo" style="height: 60px; object-fit: contain;" onerror="this.outerHTML='<i class=\'bi bi-hexagon-fill fs-1 text-[#c29b38]\'></i>'">
+        <img src="https://upload.wikimedia.org/wikipedia/en/f/f3/Gen.G_esports_logo.svg" alt="Gen.G Logo" style="height: 60px; object-fit: contain;" onerror="this.outerHTML='<i class=\'bi bi-hexagon-fill fs-1 text-[#c29b38]\'></i>'">
     </div>
     <h3 class="font-black mb-8 text-2xl tracking-tight text-gray-900">GGA BRANCH</h3>
     <input type="password" id="access-code" class="form-control-custom mb-5 text-center text-lg" placeholder="접속 코드" onkeyup="if(event.key==='Enter') login()">
@@ -191,7 +188,7 @@
     <!-- Desktop Sidebar -->
     <aside class="sidebar">
         <div class="flex items-center gap-3 px-2 py-4 mb-4 border-b border-gray-200">
-            <img src="./logo.png" alt="Gen.G" style="height: 28px; object-fit: contain;" onerror="this.outerHTML='<i class=\'bi bi-hexagon-fill fs-4 text-[#c29b38]\'></i>'">
+            <img src="https://upload.wikimedia.org/wikipedia/en/f/f3/Gen.G_esports_logo.svg" alt="Gen.G" style="height: 28px; object-fit: contain;" onerror="this.outerHTML='<i class=\'bi bi-hexagon-fill fs-4 text-[#c29b38]\'></i>'">
             <div><div class="font-black text-sm text-gray-900">GGA BRANCH</div><div class="text-[11px] font-bold text-gray-500" id="u-name">관리자</div></div>
         </div>
         <div class="nav-item active" data-target="home" onclick="showSection('home', this)"><i class="bi bi-house-door"></i> 메인 대시보드</div>
@@ -231,7 +228,7 @@
                 
                 <div id="dashboard-summary" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6"></div>
                 
-                <!-- ✅ 퀵메뉴 복구 -->
+                <!-- 퀵메뉴 -->
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
                     <div class="glass-panel p-4 text-center cursor-pointer hover:-translate-y-1 transition-transform" onclick="showSection('system')">
                         <i class="bi bi-people-fill text-3xl text-blue-500 mb-2 block"></i><h5 class="font-bold text-sm text-gray-800">학생 데이터</h5>
@@ -253,14 +250,14 @@
                     </div>
                 </div>
 
-                <!-- 지역/시간별 현황표 (Timeline) -->
+                <!-- 현황표 -->
                 <div id="timeline-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"></div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="glass-panel flex flex-col h-96">
                         <div class="p-5 border-b border-gray-100 flex items-center gap-3">
                             <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-500"><i class="bi bi-exclamation-triangle-fill"></i></div>
-                            <h3 class="font-bold text-base text-gray-900">긴급 확인 필요</h3>
+                            <h3 class="font-bold text-base text-gray-900">수강 종료 임박</h3>
                         </div>
                         <div class="flex-1 overflow-auto p-2"><table class="w-full text-center text-sm"><tbody id="urgent-list-body"></tbody></table></div>
                     </div>
@@ -327,6 +324,8 @@
             <!-- 3. Analytics -->
             <section id="analytics-view" class="view-section">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    
+                    <!-- KPI 1: 지점별 수강생 비율 -->
                     <div class="glass-panel p-6 flex flex-col">
                         <div class="mb-4 border-b border-white/50 pb-4">
                             <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
@@ -336,6 +335,7 @@
                         <div class="chart-box flex-1"><canvas id="chart-branch"></canvas></div>
                     </div>
                     
+                    <!-- KPI 2: 주요 퇴원 사유 -->
                     <div class="glass-panel p-6 flex flex-col">
                         <div class="mb-4 border-b border-white/50 pb-4 flex justify-between items-center flex-wrap gap-2">
                             <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
@@ -354,6 +354,7 @@
                         <div class="chart-box flex-1"><canvas id="chart-churn"></canvas></div>
                     </div>
 
+                    <!-- KPI 3: 전체 및 지점별 수강생 추이 -->
                     <div class="glass-panel p-6 flex flex-col lg:col-span-2">
                         <div class="mb-4 border-b border-gray-100 pb-4 flex justify-between items-center">
                             <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
@@ -363,17 +364,28 @@
                         <div class="chart-box flex-1"><canvas id="chart-trend"></canvas></div>
                     </div>
 
-                    <div class="glass-panel p-6 flex flex-col lg:col-span-2">
+                    <!-- NEW KPI 4: 코치별 담당 수강생 (세로형) -->
+                    <div class="glass-panel p-6 flex flex-col">
                         <div class="mb-4 border-b border-gray-100 pb-4">
                             <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
-                                <i class="bi bi-person-video3 text-emerald-500"></i> 코치별 담당 수강생 현황 (Active & Waiting)
+                                <i class="bi bi-person-video3 text-emerald-500"></i> 코치별 담당 수강생 현황
                             </h3>
                         </div>
                         <div class="chart-box flex-1"><canvas id="chart-coach-students"></canvas></div>
                     </div>
+
+                    <!-- NEW KPI 5: 코치별 연장 및 퇴원 통계 -->
+                    <div class="glass-panel p-6 flex flex-col">
+                        <div class="mb-4 border-b border-gray-100 pb-4">
+                            <h3 class="text-base font-black text-gray-800 flex items-center gap-2">
+                                <i class="bi bi-arrow-repeat text-indigo-500"></i> 코치별 연장 및 퇴원 통계
+                            </h3>
+                        </div>
+                        <div class="chart-box flex-1"><canvas id="chart-renewal-coach"></canvas></div>
+                    </div>
                 </div>
 
-                <!-- ✅ Daily Report 테이블 복구 -->
+                <!-- Daily Report -->
                 <div class="glass-panel p-6 mb-8">
                     <h5 class="text-base font-black text-gray-800 mb-4 flex items-center gap-2 border-l-4 border-blue-500 pl-3">Daily Report (7 Days)</h5>
                     <div class="table-container shadow-none border-0 max-h-96 overflow-y-auto">
@@ -437,8 +449,9 @@
     </div>
 </div>
 
+<!-- 💡 개편된 Focused Card Layout Edit Modal (1단 중앙 집중형) -->
 <div class="modal fade" id="editModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content glass-panel border-0 p-0 overflow-hidden">
             <div class="bg-white p-5 border-b border-gray-200 flex justify-between items-center">
                 <div>
@@ -447,37 +460,44 @@
                 </div>
                 <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+            
             <div class="p-6 bg-[#f8fafc]">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="flex flex-col gap-5">
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                            <label class="block text-sm font-black text-gray-800 mb-3"><i class="bi bi-pencil-square text-[#c29b38]"></i> 선택한 항목 값 변경</label>
-                            <div id="edit-input-container"></div>
-                            <button onclick="save()" class="btn-gold w-full mt-3 text-base py-3">정보 업데이트</button>
-                        </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex-1 flex flex-col">
-                            <label class="block text-sm font-black text-gray-800 mb-3"><i class="bi bi-chat-dots-fill text-blue-500"></i> 메모 추가 (@코멘트)</label>
-                            <div class="flex gap-2 mb-3">
-                                <input type="text" id="comment-input" class="form-control-custom flex-1 bg-gray-50" placeholder="내용을 입력하세요...">
-                                <button class="btn-glass px-4 m-0 bg-gray-100 hover:bg-gray-200" onclick="submitComment()">등록</button>
-                            </div>
-                            <div id="comment-history" class="overflow-auto text-sm text-gray-600 flex-1 space-y-2 max-h-32"></div>
-                        </div>
+                <!-- 상단: 직접적인 항목 변경 영역 (항상 노출) -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
+                    <label class="block text-sm font-black text-gray-800 mb-3"><i class="bi bi-pencil-square text-[#c29b38]"></i> 선택한 항목 값 변경</label>
+                    <div id="edit-input-container"></div>
+                    <button onclick="save()" class="btn-gold w-full mt-4 text-base py-3 shadow-md">정보 업데이트 (저장)</button>
+                </div>
+
+                <!-- 하단: 보조 텍스트 탭 (메모, 상담, 연장 사유) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="flex border-b border-gray-100 bg-gray-50">
+                        <button id="tab-btn-memo" class="flex-1 py-3 text-sm font-bold text-[#c29b38] bg-white border-b-2 border-[#c29b38] transition-colors" onclick="switchEditModalTab('memo')">메모 (@코멘트)</button>
+                        <button id="tab-btn-consult" class="flex-1 py-3 text-sm font-bold text-gray-500 hover:text-gray-800 transition-colors" onclick="switchEditModalTab('consult')">상담 일지</button>
+                        <button id="tab-btn-ext" class="flex-1 py-3 text-sm font-bold text-gray-500 hover:text-gray-800 transition-colors" onclick="switchEditModalTab('ext')">연장 사유</button>
                     </div>
                     
-                    <div class="flex flex-col gap-5">
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex-1 flex flex-col">
-                            <label class="block text-sm font-black text-gray-800 mb-3"><i class="bi bi-journal-text text-emerald-500"></i> 상담 일지 작성</label>
-                            <textarea id="consult-editor" class="form-control-custom flex-1 resize-none mb-3 p-4 bg-gray-50 h-32"></textarea>
-                            <button class="btn-glass w-full bg-gray-100 hover:bg-gray-200" onclick="saveConsultation()">일지 저장</button>
+                    <div class="p-5">
+                        <div id="tab-content-memo" class="block">
+                            <div class="flex gap-2 mb-3">
+                                <input type="text" id="comment-input" class="form-control-custom flex-1 bg-gray-50" placeholder="내용을 입력하세요...">
+                                <button class="btn-glass px-4 m-0 bg-gray-100 hover:bg-gray-200 shadow-sm" onclick="submitComment()">등록</button>
+                            </div>
+                            <div id="comment-history" class="overflow-auto text-sm text-gray-600 space-y-2 max-h-32 pr-2"></div>
                         </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex-1 flex flex-col">
-                            <label class="block text-sm font-black text-gray-800 mb-3"><i class="bi bi-calendar-check text-red-500"></i> 수강 연장 사유</label>
-                            <textarea id="extension-editor" class="form-control-custom flex-1 resize-none mb-3 p-4 bg-gray-50 h-32"></textarea>
-                            <button class="btn-glass w-full bg-gray-100 hover:bg-gray-200" onclick="saveExtensionReason()">사유 저장</button>
+                        
+                        <div id="tab-content-consult" class="hidden">
+                            <textarea id="consult-editor" class="form-control-custom w-full resize-none mb-3 p-4 bg-gray-50 h-32 text-sm leading-relaxed"></textarea>
+                            <button class="btn-glass w-full bg-gray-100 hover:bg-gray-200 shadow-sm" onclick="saveConsultation()">일지 저장</button>
+                        </div>
+                        
+                        <div id="tab-content-ext" class="hidden">
+                            <textarea id="extension-editor" class="form-control-custom w-full resize-none mb-3 p-4 bg-gray-50 h-32 text-sm leading-relaxed"></textarea>
+                            <button class="btn-glass w-full bg-gray-100 hover:bg-gray-200 shadow-sm" onclick="saveExtensionReason()">사유 저장</button>
                         </div>
                     </div>
                 </div>
+                
                 <input type="hidden" id="m-row"><input type="hidden" id="m-col">
             </div>
         </div>
@@ -516,7 +536,6 @@
                 <div><label class="block text-sm font-bold text-gray-700 mb-1">연락처</label><input type="text" id="ld-phone" class="form-control-custom"></div>
                 <div><label class="block text-sm font-bold text-gray-700 mb-1">상담 방식</label><select id="ld-type" class="form-select-custom"><option>전화 상담</option><option>방문 상담</option></select></div>
                 <div><label class="block text-sm font-bold text-gray-700 mb-1">일자</label><input type="date" id="ld-date" class="form-control-custom"></div>
-                <!-- ✅ 리드 형태 옵션 완벽 복원 -->
                 <div><label class="block text-sm font-bold text-gray-700 mb-1">리드 형태</label><select id="ld-leadType" class="form-select-custom"><option value="전화">전화</option><option value="온라인">온라인</option><option value="워크인">워크인</option><option value="슬랙 알림">슬랙 알림</option><option value="본점 인계">본점 인계</option><option value="친구 소개">친구 소개</option><option value="코치 소개">코치 소개</option><option value="네이버 예약">네이버 예약</option></select></div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">리드 세부</label>
@@ -580,6 +599,36 @@
     el.innerHTML = `<i class="bi bi-check-lg text-[#c29b38]"></i> ${msg}`;
     box.appendChild(el);
     setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(10px)'; setTimeout(() => el.remove(), 300); }, 2500);
+  }
+
+  // 💡 전화번호 복사 우회 로직 완벽 적용 (iframe 보안 이슈 해결)
+  function copyText(text) {
+      const fallbackCopy = (textToCopy) => {
+          const textArea = document.createElement("textarea");
+          textArea.value = textToCopy;
+          textArea.setAttribute('readonly', '');
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          textArea.style.top = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          try {
+              document.execCommand('copy');
+              showToast("복사 완료: " + textToCopy);
+          } catch (err) {
+              showToast("복사 실패");
+          }
+          document.body.removeChild(textArea);
+      };
+
+      if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text)
+              .then(() => showToast("복사 완료: " + text))
+              .catch(() => fallbackCopy(text));
+      } else {
+          fallbackCopy(text);
+      }
   }
 
   function formatPhone10(v) { let s = String(v).replace(/[^0-9]/g, ""); if (s.startsWith('010')) s = s.substring(1); return s; }
@@ -831,7 +880,6 @@
             let mobileClass = ([5,6,11,13,14,16,17].includes(i)) ? "mobile-hide" : "";
             let cell = v; let onClick = `onclick="openEdit(${item.rowNum}, ${i})"`;
             
-            // ✅ CMS 다이렉트 링크 복구
             if(i === 0) {
                 cell = `<a href="https://admin.gengesports.cn/users/detail/${v}" target="_blank" class="col-id font-bold text-[#3b82f6] hover:text-blue-700 underline" onclick="event.stopPropagation()">${v}</a>`;
             }
@@ -856,6 +904,18 @@
     });
     html += `</tbody></table></div></div>`;
     return html;
+  }
+
+  // 💡 수정 모달 탭 변경 함수 (1단 집중형 레이아웃)
+  function switchEditModalTab(tab) {
+      ['memo', 'consult', 'ext'].forEach(t => {
+          document.getElementById(`tab-btn-${t}`).className = 'flex-1 py-3 text-sm font-bold text-gray-500 hover:text-gray-800 transition-colors bg-transparent border-b-2 border-transparent';
+          document.getElementById(`tab-content-${t}`).classList.add('hidden');
+          document.getElementById(`tab-content-${t}`).classList.remove('block');
+      });
+      document.getElementById(`tab-btn-${tab}`).className = 'flex-1 py-3 text-sm font-bold text-[#c29b38] bg-white border-b-2 border-[#c29b38] transition-colors';
+      document.getElementById(`tab-content-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-content-${tab}`).classList.add('block');
   }
 
   function openEdit(r, c) { 
@@ -899,6 +959,10 @@
       }
       
       document.getElementById('comment-history').innerHTML = s.commentHistory ? s.commentHistory.split('\n').reverse().map(x => `<div class='border-b border-gray-200 pb-2 mb-2'>${x}</div>`).join('') : ""; 
+      
+      // 모달 탭 초기화
+      switchEditModalTab('memo');
+
       new bootstrap.Modal(document.getElementById('editModal')).show(); 
   }
 
@@ -911,7 +975,6 @@
       
       let disp = v; 
       if (c === 12) disp = formatPhone10(v); else if (c === 13) disp = formatPhoneHyphen(v); 
-      // ✅ CMS 다이렉트 링크 (저장 후 즉시 반영)
       else if (c === 0) disp = `<a href="https://admin.gengesports.cn/users/detail/${v}" target="_blank" class="col-id font-bold text-[#3b82f6] hover:text-blue-700 underline" onclick="event.stopPropagation()">${v}</a>`; 
       else if (c === 2) {
           let badge = 'status-active'; if(v==='Waiting') badge='status-waiting'; if(v==='Loading') badge='status-loading'; if(v==='Inactive') badge='status-inactive';
@@ -954,20 +1017,20 @@
           }
           data.churnData = churn;
           renderAnalyticsCharts(data); 
-          // ✅ 하단 데일리 리포트 데이터 표 복구
           renderStatsTable(data.tableData);
           document.getElementById('loading').classList.add('hidden');
       }).withFailureHandler(e => { document.getElementById('loading').classList.add('hidden'); showToast(e.message); }).getAnalyticsData(); 
   }
 
   function renderAnalyticsCharts(backendData) {
-      ['chart-branch', 'chart-trend', 'chart-churn', 'chart-coach-students'].forEach(id => { if (charts[id]) charts[id].destroy(); });
+      ['chart-branch', 'chart-trend', 'chart-churn', 'chart-coach-students', 'chart-renewal-coach'].forEach(id => { if (charts[id]) charts[id].destroy(); });
 
       const commonLabelOptions = {
           color: '#fff', font: { weight: 'bold' },
           formatter: (value, ctx) => { if (value === 0) return ''; let sum = ctx.dataset.data.reduce((a, b) => a + b, 0); let percent = Math.round((value / sum) * 100); return `${value}명\n(${percent}%)`; }, textAlign: 'center'
       };
 
+      // 1. 지점별 비율
       let bCount = {'Busan':0, 'Incheon':0, 'Gwangju':0};
       rawData.data.forEach(s => { if(s.values[2] === 'Active' || s.values[2] === 'Waiting') if(bCount[s.values[1]] !== undefined) bCount[s.values[1]]++; });
       charts['chart-branch'] = new Chart(document.getElementById('chart-branch').getContext('2d'), { 
@@ -976,6 +1039,7 @@
           options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right' }, datalabels: commonLabelOptions } } 
       });
 
+      // 2. 전체 수강생 추이
       let trendLabels = []; let trendData = []; let trendBusan = []; let trendIncheon = []; let trendGwangju = [];
       if (backendData && backendData.tableData && backendData.tableData.length > 0) {
           let headers = backendData.tableData[0]; 
@@ -1007,20 +1071,51 @@
           options: { responsive: true, maintainAspectRatio: false, scales: { x:{grid:{display:false}}, y:{grid:{color:'rgba(0,0,0,0.05)'}} }, plugins: { legend: { position: 'top' }, datalabels: { align: 'top', color: '#1e293b', font: { weight: 'bold' }, formatter: Math.round } } } 
       });
 
+      // 3. 💡 코치별 담당 수강생 (가로 -> 세로형 막대로 변경 완료)
       let coachCount = {}; rawData.data.forEach(s => { if(s.values[2] === 'Active' || s.values[2] === 'Waiting') { let c = s.values[4] || '미배정'; coachCount[c] = (coachCount[c] || 0) + 1; } });
       let sortedCoaches = Object.keys(coachCount).sort((a,b) => coachCount[b] - coachCount[a]);
       let cValues = sortedCoaches.map(k => coachCount[k]);
       charts['chart-coach-students'] = new Chart(document.getElementById('chart-coach-students').getContext('2d'), {
-          type: 'bar',
+          type: 'bar', // indexAxis: 'y'를 제거하여 세로형으로 변경
           data: { labels: sortedCoaches, datasets: [{ label: '수강생 수', data: cValues, backgroundColor: '#10b981', borderRadius: 4 }] },
-          options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { color: '#fff', font: { weight: 'bold' }, formatter: v => v > 0 ? v + '명' : '' } }, scales: { x: { grid: { color: 'rgba(0,0,0,0.05)' } }, y: { grid: { display: false } } } }
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { color: '#fff', font: { weight: 'bold' }, formatter: v => v > 0 ? v + '명' : '' } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(0,0,0,0.05)' }, beginAtZero: true } } }
+      });
+
+      // 4. 💡 코치별 연장 및 퇴원 통계 (신규 추가된 Stacked Bar Chart)
+      let renewalCoachStats = {};
+      if (window.globalRenewalData && window.globalRenewalData.data) {
+          window.globalRenewalData.data.forEach(r => {
+              let coach = r[2] || '미배정'; // Column C
+              let status = String(r[7]).toLowerCase(); // Column H
+              if (!renewalCoachStats[coach]) renewalCoachStats[coach] = { ren: 0, out: 0 };
+              if (status.includes('renewal') || status.includes('재등록')) renewalCoachStats[coach].ren++;
+              if (status.includes('out') || status.includes('퇴원')) renewalCoachStats[coach].out++;
+          });
+      }
+      let rcLabels = Object.keys(renewalCoachStats).sort();
+      let rcRenData = rcLabels.map(k => renewalCoachStats[k].ren);
+      let rcOutData = rcLabels.map(k => renewalCoachStats[k].out);
+
+      charts['chart-renewal-coach'] = new Chart(document.getElementById('chart-renewal-coach').getContext('2d'), {
+          type: 'bar',
+          data: {
+              labels: rcLabels,
+              datasets: [
+                  { label: '연장(Renewal)', data: rcRenData, backgroundColor: '#3b82f6', borderRadius: 4 },
+                  { label: '퇴원(Out)', data: rcOutData, backgroundColor: '#ef4444', borderRadius: 4 }
+              ]
+          },
+          options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { legend: { position: 'top' }, datalabels: { color: '#fff', font: { weight: 'bold' }, formatter: v => v > 0 ? v + '건' : '' } },
+              scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { color: 'rgba(0,0,0,0.05)' }, beginAtZero: true } }
+          }
       });
 
       window.globalAnalyticsData = backendData; 
       filterChurn('All');
   }
 
-  // ✅ 데이터 분석 탭의 'Daily Report' 표 복구
   function renderStatsTable(d) { 
       const c = document.getElementById('analytics-table-container'); 
       if (!d || !d.length) { c.innerHTML = '<div class="p-5 text-center text-gray-400">데이터가 없습니다.</div>'; return; } 
@@ -1051,7 +1146,6 @@
 
   function loadConsultationList() { showSection('consultation'); document.getElementById('loading').classList.remove('hidden'); google.script.run.withSuccessHandler(res => { const data = typeof res === 'string' ? JSON.parse(res) : res; window.globalConsultationData = data; filterConsultation('All'); document.getElementById('loading').classList.add('hidden'); }).loadConsultationData(); }
   
-  // ✅ 리드/상담 액션(등록,상담,삭제) 기능 및 스타일 완벽 복구
   function filterConsultation(b, el) { 
       if(el) { document.querySelectorAll('#consult-branch-filters .pill-tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); } 
       const c = document.getElementById('consultation-content'); let data = window.globalConsultationData || []; if(b !== 'All') data = data.filter(r => r[1] === b);
@@ -1068,7 +1162,6 @@
         let consultDate = new Date(r[4]); consultDate.setHours(0,0,0,0);
         let consultTime = consultDate.getTime();
 
-        // 배경색 로직 복구
         if (r[0]) { rowClass = "bg-green-50 text-green-800 hover:bg-green-100"; } 
         else if (r[4]) {
             if (consultTime < startOfWeek.getTime() && consultDate.getTime() !== 0) rowClass = "bg-gray-100 text-gray-500 hover:bg-gray-200"; 
@@ -1076,8 +1169,6 @@
         }
 
         h += `<tr class="${rowClass}">`;
-        
-        // 액션 버튼 영역 복구 (등록, 상담, 삭제)
         h += `<td class="text-nowrap p-2">
                 <button class="text-red-500 hover:bg-red-100 px-2 py-1 rounded transition-colors mr-1" onclick="deleteLeadDirectly(${r[18]}, '${r[17]||''}', '${r[8]}')" title="삭제"><i class="bi bi-trash"></i></button>
                 <button class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs font-bold mr-1 transition-colors" onclick="openLeadModal(${r[18]})">상담</button>`;
@@ -1123,7 +1214,6 @@
       new bootstrap.Modal(document.getElementById('leadModal')).show();
   }
 
-  // ✅ 신규 학생 등록 자동 채우기(pre-fill) 로직 복구
   function startRegistration(rowIdx) {
       const r = window.globalConsultationData.find(item => parseInt(item[18]) === parseInt(rowIdx));
       if(!r) return;
@@ -1132,7 +1222,6 @@
       document.getElementById('add-lead-row').value = rowIdx;
       document.getElementById('add-branch').value = r[1] || 'Busan';
       
-      // Select Box Option Population Backup
       const setOpts = (id, arr, def) => { const el = document.getElementById(id); el.innerHTML = arr.map(v => `<option value="${v}" ${v===def?'selected':''}>${v}</option>`).join(''); };
       setOpts('add-program', ['VAL Plus', 'VAL Basic', 'VAL Pro'], 'VAL Plus');
       setOpts('add-days', ['월수', '화목', '토일', '토', '일'], '토일');
@@ -1154,13 +1243,11 @@
 
   function submitNewStudent() { bootstrap.Modal.getInstance(document.getElementById('addModal')).hide(); document.getElementById('loading').classList.remove('hidden'); google.script.run.withSuccessHandler(()=>{document.getElementById('loading').classList.add('hidden'); showToast("등록 완료"); refreshData();}).withFailureHandler(e=>{document.getElementById('loading').classList.add('hidden'); showToast(e.message);}).addNewStudent(JSON.stringify({id:document.getElementById('add-id').value, branch:document.getElementById('add-branch').value, coach:document.getElementById('add-coach').value, program:document.getElementById('add-program').value, name:document.getElementById('add-name').value, phone:document.getElementById('add-phone').value, leadRow:document.getElementById('add-lead-row').value, leadNote:document.getElementById('add-lead-note').value, orderId:document.getElementById('add-orderId').value}), userInfo.name); }
   function submitLead() { bootstrap.Modal.getInstance(document.getElementById('leadModal')).hide(); document.getElementById('loading').classList.remove('hidden'); google.script.run.withSuccessHandler(()=>{document.getElementById('loading').classList.add('hidden'); loadConsultationList(null);}).withFailureHandler(e=>{document.getElementById('loading').classList.add('hidden'); showToast(e.message);}).updateConsultation(JSON.stringify({})); }
-  
-  // ✅ 리드 삭제 버튼 기능 복구
   function deleteLeadDirectly(rowIdx, eventId, name) {
       if (!confirm(`정말 [${name}] 학생의 상담 기록을 삭제하시겠습니까?\n(연동된 캘린더 일정도 함께 삭제됩니다)`)) return;
       document.getElementById('loading').classList.remove('hidden');
       google.script.run.withSuccessHandler(()=>{
-          document.getElementById('loading').classList.add('hidden'); loadConsultationList(); showToast("기록이 성공적으로 삭제되었습니다.");
+          document.getElementById('loading').classList.add('hidden'); loadConsultationList(); showToast("기록이 삭제되었습니다.");
       }).withFailureHandler(e=>{ document.getElementById('loading').classList.add('hidden'); showToast(e.message); }).deleteConsultation(JSON.stringify({ row: rowIdx, eventId: eventId, manager: userInfo.name, name: name, branch: userInfo.region }));
   }
   function deleteLead() {
@@ -1168,7 +1255,7 @@
       if (!rowIdx) return; if (!confirm(`정말 [${name}] 학생의 상담 기록을 삭제하시겠습니까?\n(연동된 캘린더 일정도 함께 삭제됩니다)`)) return;
       bootstrap.Modal.getInstance(document.getElementById('leadModal')).hide(); document.getElementById('loading').classList.remove('hidden');
       google.script.run.withSuccessHandler(()=>{
-          document.getElementById('loading').classList.add('hidden'); loadConsultationList(); showToast("기록이 성공적으로 삭제되었습니다.");
+          document.getElementById('loading').classList.add('hidden'); loadConsultationList(); showToast("기록이 삭제되었습니다.");
       }).withFailureHandler(e=>{ document.getElementById('loading').classList.add('hidden'); showToast(e.message); }).deleteConsultation(JSON.stringify({ row: rowIdx, eventId: eventId, manager: userInfo.name, name: name, branch: userInfo.region }));
   }
 
